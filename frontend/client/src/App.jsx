@@ -5,6 +5,7 @@ import Signup from '../src/signup';
 import Login from '../src/login';
 import Home from '../src/home';
 import DoctorDashboard from '../src/doctordashboard';
+import DoctorDashboardMain from '../pages/doctordashboard/DoctorDashboardMain';
 
 const PrivateRoute = ({ children, allowedRoles }) => {
   const { isAuthenticated, user } = useSelector((state) => state.auth);
@@ -43,6 +44,9 @@ function App() {
               </PrivateRoute>
             }
           />
+
+               <Route path="/DoctorDashboardMain" element={<DoctorDashboardMain />} />
+
         </Routes>
       </div>
     </Router>
