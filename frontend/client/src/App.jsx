@@ -6,11 +6,11 @@ import Login from '../src/login';
 import Home from '../src/home';
 import DoctorDashboard from '../src/doctordashboard';
 
-import DoctorDashboardMain from '../pages/doctordashboard/DoctorDashboardMain';
+import DoctorDashboardMain from './pages/doctordashboard/DoctorDashboardMain';
 
 import Header from './components/Header';
 import Footer from './components/Footer';
-import UserProfile from './components/pages/UserProfile';
+import UserProfile from './pages/UserProfile';
 
 
 const PrivateRoute = ({ children, allowedRoles }) => {
