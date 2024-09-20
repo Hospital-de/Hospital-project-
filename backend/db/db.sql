@@ -17,6 +17,7 @@ CREATE TABLE DoctorDetails (
     hospital_name TEXT,
     phone_number VARCHAR(20) NOT NULL,
     address TEXT,
+    image TEXT,
     email VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
