@@ -9,7 +9,8 @@ router.get('/hello', async (req, res) => {
 
 router.post('/availability', DoctorAvailability.addDoctorAvailability);
 router.get('/availability/:doctorId', DoctorAvailability.getDoctorAvailability);
-
+router.patch('/availability/:id', DoctorAvailability.editDoctorAvailability);  // Edit availability
+router.delete('/availability/:id', DoctorAvailability.deleteDoctorAvailability);  // Delete availability
 
 
 

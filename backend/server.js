@@ -3,6 +3,7 @@ const cors = require('cors');
 const pool = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const doctorAvailabilityRoutes = require('./routes/doctorAvailabilityRoutes')
+const doctorAppointmentRoute = require('./routes/doctorAppointmentRoute')
 require('dotenv').config();
 
 const app = express();
@@ -15,6 +16,8 @@ app.use('/api/auth', authRoutes);
 
 //tasneem routes
 app.use('/api', doctorAvailabilityRoutes);
+app.use('/api', doctorAppointmentRoute);
+
 
 
 pool.connect((err) => {

@@ -47,8 +47,58 @@ const getDoctorAvailability = async (req, res) => {
   }
 };
 
+// Edit doctor availability
+
+// Edit doctor availability
+const editDoctorAvailability = async (req, res) => {
+  const availabilityId = req.params.id;
+  const { date, time_slot, is_available, is_booked } = req.body;
+
+  const query = `
+    UPDATE DoctorAvailability 
+    SET date = $1, time_slot = $2, is_available = $3, is_booked = $4
+    WHERE id = $5
+    RETURNING *;
+  `;
+  const values = [date, time_slot, is_available, is_booked, availabilityId];
+
+  try {
+    const result = await pool.query(query, values);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Availability not found' });
+    }
+    res.status(200).json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Soft delete doctor availability
+const deleteDoctorAvailability = async (req, res) => {
+  const { id } = req.params;
+
+  const query = `
+    UPDATE DoctorAvailability
+    SET is_deleted = TRUE
+    WHERE id = $1
+    RETURNING *;
+  `;
+  const values = [id];
+
+  try {
+    const result = await pool.query(query, values);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Availability not found or already deleted' });
+    }
+    res.status(200).json({ message: 'Availability deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 
 module.exports = {
   addDoctorAvailability,
-  getDoctorAvailability
+  getDoctorAvailability,
+  editDoctorAvailability,
+  deleteDoctorAvailability
 };

@@ -1,100 +1,167 @@
-import React from 'react';
-import { Calendar, MessageSquare, Users, Activity, Plus, Bell } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Calendar, MessageSquare, Users, Activity, Plus, Bell, Sun, ChevronRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+import axios from 'axios';
 
 const InformationMain = () => {
+  const [appointmentsData, setAppointmentsData] = useState({ total_appointments: 0, total_patients: 0, appointments: [] });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const doctorId = 1; // Replace with the actual doctor ID you want to fetch
+        const response = await axios.get(`http://localhost:4025/api/appointments/${doctorId}`);
+        
+        // Simulate a longer loading time (3 seconds)
+        setTimeout(() => {
+          setAppointmentsData(response.data);
+          setLoading(false);
+        }, 3000);
+      } catch (err) {
+        // Simulate a delay before showing the error as well
+        setTimeout(() => {
+          setError('Failed to fetch appointments');
+          setLoading(false);
+        }, 3000);
+      }
+    };
+
+    fetchAppointments();
+  }, []);
+
+  const { total_appointments, total_patients, appointments } = appointmentsData;
+
   return (
-    <div className="rounded-xl  min-h-screen mt-12">
-      <div className="rounded-xl shadow-md bg-gray-100  p-10">
-        <header className="flex justify-between items-center  mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800">Good Morning,</h1>
+    <motion.div 
+      initial={{ opacity: 0 }} 
+      animate={{ opacity: 1 }} 
+      transition={{ duration: 0.5 }}
+      className="rounded-xl min-h-screen mt-12"
+    >
+      <div className="rounded-xl shadow-lg bg-gradient-to-br from-gray-100 to-gray-200 p-10">
+        {/* Header */}
+        <header className="flex justify-between items-center mb-8">
+          <motion.div initial={{ x: -20 }} animate={{ x: 0 }} transition={{ duration: 0.5 }}>
+            <h1 className="text-3xl font-bold text-gray-800 flex items-center">
+              Good Morning <Sun className="ml-2 text-yellow-500" />
+            </h1>
             <h2 className="text-2xl font-semibold text-blue-600">Dr. Arkali Moorthi</h2>
-            <p className="text-gray-600">Have a nice day at work</p>
-          </div>
+            <p className="text-gray-600 flex items-center">Have a nice day at work <Activity className="ml-2 text-green-500" size={16} /></p>
+          </motion.div>
           <div className="flex space-x-4 items-center">
-            <button className="text-gray-600 hover:text-gray-800">
+            <motion.button 
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="text-gray-600 hover:text-gray-800 relative"
+            >
               <Bell size={24} />
-            </button>
-            <button className="bg-teal-500 text-white px-4 py-2 rounded-md hover:bg-teal-600">
-              + Add Patient
-            </button>
+              <span className="absolute top-0 right-0 bg-red-500 rounded-full w-2 h-2"></span>
+            </motion.button>
+            <motion.button 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-teal-500 text-white px-4 py-2 rounded-md hover:bg-teal-600 flex items-center"
+            >
+              <Plus size={20} className="mr-2" /> Add Patient
+            </motion.button>
           </div>
         </header>
 
+        {/* Weekly Reports */}
         <section className="mb-8">
-          <h3 className="text-xl font-semibold mb-4">Weekly Reports</h3>
-          <div className="grid grid-cols-4 gap-4">
-            <ReportCard icon={<Calendar className="text-teal-500" />} title="Total Patients" value="268" color="bg-teal-100" />
-            <ReportCard icon={<MessageSquare className="text-yellow-500" />} title="News Calls" value="260" color="bg-yellow-100" />
-            <ReportCard icon={<Users className="text-red-500" />} title="Appointments" value="128" color="bg-red-100" />
+          <h3 className="text-xl font-semibold mb-4 flex items-center">
+            Weekly Reports <ChevronRight className="ml-2" size={20} />
+          </h3>
+          <motion.div 
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <ReportCard icon={<Calendar className="text-teal-500" />} title="Total Patients" value={total_patients} color="bg-teal-100" />
+            <ReportCard icon={<MessageSquare className="text-yellow-500" />} title="New Calls" value="260" color="bg-yellow-100" />
+            <ReportCard icon={<Users className="text-red-500" />} title="Appointments" value={total_appointments} color="bg-red-100" />
             <ReportCard icon={<Activity className="text-blue-500" />} title="Annual Plan" value="321" color="bg-blue-100" />
-            <div className="flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg">
-              <Plus className="text-gray-400" size={24} />
-            </div>
-          </div>
+          </motion.div>
         </section>
 
+        {/* Today's Appointments */}
         <section>
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-semibold">Today's Appointment</h3>
-            <button className="text-blue-500 hover:text-blue-600">See all</button>
+            <h3 className="text-xl font-semibold flex items-center">Today's Appointment <Calendar className="ml-2 text-blue-500" size={20} /></h3>
           </div>
-          <table className="w-full">
-            <thead>
-              <tr className="text-left text-gray-600">
-                <th className="pb-2">Name</th>
-                <th className="pb-2">Gender</th>
-                <th className="pb-2">Date</th>
-                <th className="pb-2">Time</th>
-                <th className="pb-2">Status</th>
-                <th className="pb-2"></th>
-              </tr>
-            </thead>
-            <tbody>
-              <AppointmentRow
-                name="Natalie Tompson"
-                gender="Female"
-                date="20 Jun 2023"
-                time="09:30 AM"
-                status="Checked"
-              />
-              {/* Add more rows as needed */}
-            </tbody>
-          </table>
+          <motion.div 
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="bg-white rounded-lg shadow-md overflow-hidden"
+          >
+            <table className="w-full">
+              <thead>
+                <tr className="text-left text-gray-600 bg-gray-50">
+                  <th className="py-3 px-4">Name</th>
+                  <th className="py-3 px-4">Gender</th>
+                  <th className="py-3 px-4">Date</th>
+                  <th className="py-3 px-4">Time</th>
+                  <th className="py-3 px-4">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {appointments.map((appointment) => (
+                  <AppointmentRow
+                    key={appointment.appointment_id}
+                    name={appointment.patient_name}
+                    gender="Female" 
+                    date={appointment.appointment_date}
+                    time={appointment.appointment_time}
+                    status={appointment.status}
+                  />
+                ))}
+              </tbody>
+            </table>
+          </motion.div>
         </section>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
 const ReportCard = ({ icon, title, value, color }) => (
-  <div className={`${color} p-4 rounded-lg flex items-center space-x-4`}>
-    <div className="p-3 bg-white rounded-full">{icon}</div>
+  <motion.div 
+    whileHover={{ scale: 1.05 }}
+    className={`${color} p-4 rounded-lg flex items-center space-x-4 shadow-sm`}
+  >
+    <div className="p-3 bg-white rounded-full shadow-inner">{icon}</div>
     <div>
       <p className="text-gray-600">{title}</p>
       <p className="text-2xl font-bold">{value}</p>
     </div>
-  </div>
+  </motion.div>
 );
 
 const AppointmentRow = ({ name, gender, date, time, status }) => (
-  <tr className="border-b border-gray-200">
-    <td className="py-4 flex items-center space-x-3">
-      <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
-      <span>{name}</span>
+  <motion.tr 
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ duration: 0.3 }}
+    className="border-b border-gray-200 hover:bg-gray-50"
+  >
+    <td className="py-4 px-4 flex items-center">
+      <div className="ml-3">
+        <p className="font-semibold">{name}</p>
+      </div>
     </td>
-    <td>{gender}</td>
-    <td>{date}</td>
-    <td>{time}</td>
-    <td>
-      <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+    <td className="py-4 px-4">{gender}</td>
+    <td className="py-4 px-4">{date}</td>
+    <td className="py-4 px-4">{time}</td>
+    <td className="py-4 px-4">
+      <span className={`text-sm px-2 py-1 rounded-full ${status === 'Completed' ? 'bg-green-100 text-green-600' : 'bg-red-500 text-red-100'}`}>
         {status}
       </span>
     </td>
-    <td>
-      <button className="text-gray-400 hover:text-gray-600">...</button>
-    </td>
-  </tr>
+  </motion.tr>
 );
 
 export default InformationMain;

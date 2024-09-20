@@ -4,27 +4,41 @@ import axios from 'axios';
 const AppointmentFormPopup = ({ onClose, selectedDate }) => {
   const initialDate = typeof selectedDate === 'string' ? selectedDate.split('T')[0] : '';
   const [date, setDate] = useState(initialDate);
-  const [timeSlot, setTimeSlot] = useState('');
+  const [startHour, setStartHour] = useState('');
+  const [startMinute, setStartMinute] = useState('');
+  const [endHour, setEndHour] = useState('');
+  const [endMinute, setEndMinute] = useState('');
+  const [startPeriod, setStartPeriod] = useState('AM');
+  const [endPeriod, setEndPeriod] = useState('AM');
   const [isAvailable, setIsAvailable] = useState(true);
   const [error, setError] = useState('');
 
-  const validateTimeSlot = (time) => {
-    const regex = /^(0[1-9]|1[0-2]):[0-5][0-9](AM|PM)-(0[1-9]|1[0-2]):[0-5][0-9](AM|PM)$/;
-    return regex.test(time);
+  const hours = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0'));
+  const minutes = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'));
+
+  const validateTimeSlot = () => {
+    const startTime = `${startHour}:${startMinute}${startPeriod}`;
+    const endTime = `${endHour}:${endMinute}${endPeriod}`;
+    return startTime !== endTime && startHour && startMinute && endHour && endMinute;
+  };
+
+  const formatTimeSlot = () => {
+    return `${startHour}:${startMinute}${startPeriod}-${endHour}:${endMinute}${endPeriod}`;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateTimeSlot(timeSlot)) {
-      setError('Please enter a valid time slot (e.g., 09:00AM-10:00AM)');
+    if (!validateTimeSlot()) {
+      setError('Please enter a valid time slot');
       return;
     }
 
-    setError(''); // Clear any previous errors
+    setError('');
 
     try {
-      const doctorId = 1; // Replace with dynamic doctor_id if needed
+      const doctorId = 1; 
+      const timeSlot = formatTimeSlot();
 
       await axios.post('http://localhost:4025/api/availability', {
         doctor_id: doctorId,
@@ -33,7 +47,7 @@ const AppointmentFormPopup = ({ onClose, selectedDate }) => {
         is_available: isAvailable
       });
 
-      onClose(); // Close the popup after successful submission
+      onClose();
     } catch (error) {
       console.error('Error adding appointment:', error);
     }
@@ -55,17 +69,96 @@ const AppointmentFormPopup = ({ onClose, selectedDate }) => {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Time Slot (e.g., 09:00AM-10:00AM):</label>
-            <input
-              type="text"
-              value={timeSlot}
-              onChange={(e) => setTimeSlot(e.target.value)}
-              className="mt-1 p-2 border border-gray-300 rounded w-full"
-              placeholder="Enter time slot"
-              required
-            />
-            {error && <p className="text-red-500 text-sm">{error}</p>} {/* Display error message */}
+            <label className="block text-gray-700">Time Slot:</label>
+            <div className="flex space-x-2">
+              <select
+                value={startHour}
+                onChange={(e) => setStartHour(e.target.value)}
+                className="p-2 border border-gray-300 rounded"
+                required
+              >
+                <option value="">Hour</option>
+                {hours.map(hour => (
+                  <option key={`start-${hour}`} value={hour}>{hour}</option>
+                ))}
+              </select>
+              <select
+                value={startMinute}
+                onChange={(e) => setStartMinute(e.target.value)}
+                className="p-2 border border-gray-300 rounded"
+                required
+              >
+                <option value="">Minute</option>
+                {minutes.map(minute => (
+                  <option key={`start-${minute}`} value={minute}>{minute}</option>
+                ))}
+              </select>
+              <div className="flex items-center space-x-2">
+                <label>
+                  <input
+                    type="radio"
+                    value="AM"
+                    checked={startPeriod === 'AM'}
+                    onChange={() => setStartPeriod('AM')}
+                  /> AM
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    value="PM"
+                    checked={startPeriod === 'PM'}
+                    onChange={() => setStartPeriod('PM')}
+                  /> PM
+                </label>
+              </div>
+            </div>
           </div>
+          <div className="mb-4">
+            <label className="block text-gray-700">End Time:</label>
+            <div className="flex space-x-2">
+              <select
+                value={endHour}
+                onChange={(e) => setEndHour(e.target.value)}
+                className="p-2 border border-gray-300 rounded"
+                required
+              >
+                <option value="">Hour</option>
+                {hours.map(hour => (
+                  <option key={`end-${hour}`} value={hour}>{hour}</option>
+                ))}
+              </select>
+              <select
+                value={endMinute}
+                onChange={(e) => setEndMinute(e.target.value)}
+                className="p-2 border border-gray-300 rounded"
+                required
+              >
+                <option value="">Minute</option>
+                {minutes.map(minute => (
+                  <option key={`end-${minute}`} value={minute}>{minute}</option>
+                ))}
+              </select>
+              <div className="flex items-center space-x-2">
+                <label>
+                  <input
+                    type="radio"
+                    value="AM"
+                    checked={endPeriod === 'AM'}
+                    onChange={() => setEndPeriod('AM')}
+                  /> AM
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    value="PM"
+                    checked={endPeriod === 'PM'}
+                    onChange={() => setEndPeriod('PM')}
+                  /> PM
+                </label>
+              </div>
+            </div>
+          </div>
+          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
           <div className="mb-4">
             <label className="block text-gray-700">Available:</label>
             <select
