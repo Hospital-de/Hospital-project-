@@ -1,0 +1,60 @@
+/* Custom styles for the calendar */
+.react-calendar {
+    border: none;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .react-calendar__tile {
+    background-color: white;
+    border-radius: 0.375rem; /* Rounded corners */
+    transition: background-color 0.2s ease;
+    padding: 0.75rem;
+    font-size: 0.875rem; /* Adjust font size */
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .react-calendar__tile--now {
+    background-color: #34a5b1 !important;
+    color: white;
+  }
+  
+  .react-calendar__tile:hover {
+    background-color: #34a5b1;
+    color: white;
+  }
+  
+  .react-calendar__tile--active {
+    background-color: #1f78a0;
+    color: white;
+    font-weight: bold;
+  }
+  
+  .react-calendar__month-view__days__day--weekend {
+    color: #f87171; /* Highlight weekends */
+  }
+  
+  .react-calendar__navigation button {
+    background-color: transparent;
+    color: #1f78a0;
+    font-weight: bold;
+    font-size: 1rem;
+    padding: 0.5rem;
+  }
+  
+  .react-calendar__navigation button:enabled:hover,
+  .react-calendar__navigation button:enabled:focus {
+    background-color: #34a5b1;
+    color: white;
+  }
+  
+  .react-calendar__tile--booked {
+    background-color: #f87171 !important;
+    color: white !important;
+  }
+  
+  .react-calendar__tile--available {
+    background-color: #34a5b1 !important;
+    color: white !important;
+  }
+  
