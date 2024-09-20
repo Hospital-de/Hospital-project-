@@ -4,7 +4,6 @@ import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, Clock } from
 import axios from 'axios';
 import AppointmentFormPopup from './AppointmentFormPopup';
 import 'react-calendar/dist/Calendar.css';
-import './customCalendarStyles.css'; 
 import WelcomingAppointment from './WelcomingAppointment';
 
 const AppointmentForDoctor = () => {

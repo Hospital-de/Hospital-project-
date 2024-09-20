@@ -1,6 +1,7 @@
 // controllers/doctorAvailabilityController.js
 const pool = require('../config/db');
 
+console.log('11')
 const addDoctorAvailability = async (req, res) => {
   const { doctor_id, date, time_slot, is_available } = req.body;
 
@@ -20,22 +21,28 @@ const addDoctorAvailability = async (req, res) => {
 };
 
 
-
 const getDoctorAvailability = async (req, res) => {
-  const { doctor_id, date } = req.query; // Receive doctor_id and date as query parameters
+  const doctorId = req.params.doctorId; // Get doctor ID from the URL
+  const { date } = req.query; // Get optional date from query parameters
 
-  let query = `SELECT * FROM DoctorAvailability WHERE doctor_id = $1 AND is_deleted = FALSE`;
-  let values = [doctor_id];
+  // Validate input
+  if (!doctorId) {
+    return res.status(400).json({ error: 'doctor_id is required' });
+  }
+
+  let query = `SELECT * FROM DoctorAvailability WHERE doctor_id = $1 AND is_deleted = FALSE AND is_booked = FALSE`;
+  let values = [doctorId];
 
   if (date) {
     query += ' AND date = $2';
-    values.push(date); // Add the date to the query
+    values.push(date);
   }
 
   try {
     const result = await pool.query(query, values);
     res.status(200).json(result.rows);
   } catch (err) {
+    console.error(err); // Log the error for debugging
     res.status(500).json({ error: err.message });
   }
 };

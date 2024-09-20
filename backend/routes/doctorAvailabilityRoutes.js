@@ -2,9 +2,18 @@
 const express = require('express');
 const router = express.Router();
 const  DoctorAvailability  = require('../controllers/doctorAvailabilityController');
-console.log('12')
+
+router.get('/hello', async (req, res) => {
+    res.json("hello");
+});
 
 router.post('/availability', DoctorAvailability.addDoctorAvailability);
-router.get('/availability', DoctorAvailability.getDoctorAvailability);
+router.get('/availability/:doctorId', DoctorAvailability.getDoctorAvailability);
+
+
+
+
+
+// GET availability for a specific doctor
 
 module.exports = router;

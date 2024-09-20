@@ -80,7 +80,7 @@ const WelcomingAppointment = () => {
                 View Schedule
               </motion.button>
             </div>
-            <img src="/api/placeholder/200/200" alt="Doctor illustration" className="ml-auto h-32 rounded-full shadow-md" />
+            <img src="https://i.pinimg.com/originals/14/0e/93/140e932f29b7d85d56971d2ce1a13732.gif" alt="Doctor illustration" className="ml-auto h-32 rounded-full shadow-md" />
           </motion.div>
           
           <motion.div 
