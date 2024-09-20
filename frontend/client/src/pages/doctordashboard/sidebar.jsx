@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Home, Users, Calendar, Star, Menu, Settings, LogOut } from 'lucide-react';
 
-const Sidebar = () => {
+const Sidebar = ({ setSelectedComponent }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const sidebarRef = useRef(null);
 
@@ -28,11 +28,8 @@ const Sidebar = () => {
   }, [isExpanded]);
 
   const menuItems = [
-    { name: 'Dashboard', icon: Home },
-    { name: 'Patients', icon: Users },
-    { name: 'Appointments', icon: Calendar },
-    { name: 'Reviews', icon: Star },
-    { name: 'Settings', icon: Settings },
+    { name: 'Dashboard', icon: Home, component: 'dashboard' },
+    { name: 'Appointments', icon: Calendar, component: 'appointments' },
   ];
 
   return (
@@ -56,8 +53,8 @@ const Sidebar = () => {
       <ul className="space-y-2">
         {menuItems.map((item) => (
           <li key={item.name} className="px-4">
-            <a
-              href="#"
+            <button
+              onClick={() => setSelectedComponent(item.component)}
               className={`flex items-center py-3 px-2 rounded-lg transition-colors ${
                 isExpanded ? 'hover:bg-indigo-600' : 'justify-center hover:bg-indigo-600'
               }`}
@@ -70,14 +67,13 @@ const Sidebar = () => {
               >
                 {item.name}
               </span>
-            </a>
+            </button>
           </li>
         ))}
       </ul>
 
       <div className="absolute bottom-4 left-0 right-0 px-4">
-        <a
-          href="#"
+        <button
           className={`flex items-center py-3 px-2 rounded-lg transition-colors ${
             isExpanded ? 'hover:bg-indigo-600' : 'justify-center hover:bg-indigo-600'
           }`}
@@ -90,7 +86,7 @@ const Sidebar = () => {
           >
             Logout
           </span>
-        </a>
+        </button>
       </div>
     </nav>
   );

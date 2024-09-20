@@ -1,18 +1,19 @@
-import React from "react";
-import Sidebar from "./sidebar";
-import DoctorDashboard from "./InformationMain";
+import React, { useState } from "react";
+import Sidebar from "./Sidebar";
+import InformationMain from './InformationMain'
 import AppointmentForrDoctor from "./AppointmentForrDoctor";
 
 function DoctorDashboardMain() {
+    const [selectedComponent, setSelectedComponent] = useState("dashboard");
+
     return (
         <div className="flex">
-            <div className="flex-1 ml-40 mt-10 mr-20   h-screen mx-auto  "> {/* Main content area on the left */}
-                <DoctorDashboard/>
-                <AppointmentForrDoctor/>
-                
+            <div className="flex-1 ml-40 mt-10 mr-20 h-screen mx-auto">
+                {selectedComponent === "dashboard" && <InformationMain />}
+                {selectedComponent === "appointments" && <AppointmentForrDoctor />}
             </div>
-            <div className=""> {/* Sidebar on the right */}
-                <Sidebar />
+            <div className="">
+                <Sidebar setSelectedComponent={setSelectedComponent} />
             </div>
         </div>
     );
