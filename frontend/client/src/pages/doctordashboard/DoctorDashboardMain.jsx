@@ -1,3 +1,7 @@
+
+
+
+
 import React, { useState } from "react";
 import Sidebar from "./Sidebar";
 import InformationMain from './InformationMain'
@@ -14,6 +18,7 @@ function DoctorDashboardMain() {
             </div>
             <div className="">
                 <Sidebar setSelectedComponent={setSelectedComponent} />
+
             </div>
         </div>
     );

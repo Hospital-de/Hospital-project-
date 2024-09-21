@@ -23,20 +23,26 @@ export const signup = createAsyncThunk(
   }
 );
 
+
 export const login = createAsyncThunk(
   "auth/login",
   async (credentials, { rejectWithValue }) => {
     try {
       const response = await axios.post("http://localhost:4025/api/auth/login", credentials);
       localStorage.setItem("token", response.data.token);
+
       sessionStorage.setItem("user", JSON.stringify(response.data.user));
       console.log(response.data.user)
+
+      localStorage.setItem("user_id", response.data.user.id);  // Fix here to access the id from response.data.user
+
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
   }
 );
+
 
 
 const authSlice = createSlice({

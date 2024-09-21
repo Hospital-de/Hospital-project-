@@ -4,7 +4,9 @@ import { fetchAppointments } from '../../redux/slices/appointmentsSlice';
 import { Calendar, MessageSquare, Users, Activity, Plus, Bell, Sun, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+
 const InformationMain = () => {
+
   const dispatch = useDispatch();
   const { appointmentsData, status, error } = useSelector((state) => state.appointments);
   const { total_appointments, total_patients, appointments } = appointmentsData;
@@ -32,6 +34,7 @@ const InformationMain = () => {
   if (status === 'failed') {
     return <div>Error: {error}</div>;
   }
+
 
   return (
     <motion.div 
@@ -164,4 +167,6 @@ const AppointmentRow = ({ name, gender, date, time, status }) => (
   </motion.tr>
 );
 
+
 export default InformationMain;
+
