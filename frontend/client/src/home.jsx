@@ -1,220 +1,340 @@
-import React, { useEffect } from "react";
-import {
-  FaTooth,
-  FaSmile,
-  FaTeeth,
-  FaCalendar,
-  FaClock,
-  FaPhoneAlt,
-} from "react-icons/fa";
-import { motion, useAnimation } from "framer-motion";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { FaTooth, FaNewspaper, FaArrowRight, FaSmile, FaTeeth, FaCalendarAlt, FaUserMd, FaQuoteRight, FaChartLine, FaMicroscope, FaHeartbeat } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 import Footer from "./components/Footer";
 import Header from "./components/Header";
-import img from "./assets/tow.jpg";
-import img2 from "./assets/ms.jpg";
-import img3 from "./assets/newhero.jpg";
+import { useNavigate } from 'react-router-dom';
 
-// List of dentists (existing data)
-const dentists = [
-  { name: "Dr. Ahmed Khaled", specialty: "Orthodontics" },
-  { name: "Dr. Sarah Mohammed", specialty: "Oral and Maxillofacial Surgery" },
-  { name: "Dr. Mahmoud Ali", specialty: "Root Canal Treatment" },
-  { name: "Dr. Fatima Hassan", specialty: "Pediatric Dentistry" },
+// Assume these imports work for your project structure
+import heroVideo from "./assets/herovid.mp4";
+import img2 from "./assets/ms.jpg";
+
+const testimonials = [
+  { name: "Mohammed S.", text: "Excellent service and a very friendly staff!" },
+  { name: "Layla A.", text: "The doctors are highly knowledgeable and caring." },
+  { name: "Ahmed R.", text: "I always feel well cared for here." },
 ];
 
+const news = [
+  { title: "New Techniques in Dental Implants", date: "May 15, 2024" },
+  { title: "The Importance of Regular Dental Check-ups", date: "May 10, 2024" },
+  { title: "Tips for Maintaining Oral Health", date: "May 5, 2024" },
+];
+
+
+
 const Home = () => {
-  const controls = useAnimation();
+  const [isVisible, setIsVisible] = useState(false);
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Trigger animation after 1 second
-    const timer = setTimeout(() => {
-      controls.start("visible");
-    }, 1000);
+    setIsVisible(true);
 
-    return () => clearTimeout(timer); // Cleanup timer
-  }, [controls]);
+    const fetchDoctors = async () => {
+      try {
+        const response = await axios.get('http://localhost:4025/api/doctors');
+        setDoctors(response.data);
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching doctors:', err);
+        setError('An error occurred while fetching doctors');
+        setLoading(false);
+      }
+    };
+
+    fetchDoctors();
+  }, []);
+
+  const handleDoctorClick = (doctorId) => {
+    navigate(`/doctor/${doctorId}`);
+  };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={controls}
-      variants={{
-        visible: { opacity: 1, transition: { duration: 1 } },
-      }}
-      className="font-sans"
-    >
-      {/* Updated Header with dual neutral colors and transparency */}
+    <div className="font-sans text-sm" style={{ fontFamily: "'Poppins', sans-serif" }}>
       <Header />
 
-      {/* Hero Section */}
-      <motion.section
-        className="bg-gradient-to-r from-gray-200 to-gray-400 text-white py-20 bg-opacity-80"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 1 }}
-      >
-        <div className="container mx-auto flex items-center">
-          <div className="w-1/2">
-            <h1 className="text-4xl font-bold mb-4">
-              Bright Smile Dental Clinic
-            </h1>
-            <p className="mb-6">
-              Get the best care for your teeth with our specialized team of
-              dentists.
-            </p>
-            <button className="bg-white text-blue-500 px-6 py-2 rounded-full font-bold hover:bg-blue-100">
-              Book Your Appointment Now
-            </button>
-          </div>
-          <div className="w-1/2">
-            <motion.img
-              src={img3}
-              alt="Dentist"
-              className="rounded-lg shadow-lg"
-              whileHover={{ scale: 1.05 }}
+      {/* Hero Section with Video Background */}
+      <section className="relative h-screen overflow-hidden">
+        <video
+          autoPlay
+          loop
+          muted
+          className="absolute w-full h-full object-cover"
+        >
+          <source src={heroVideo} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/70 to-blue-700/70"></div>
+        <div className="absolute inset-0">
+          <svg
+            className="absolute inset-0 h-full w-full"
+            preserveAspectRatio="xMidYMid slice"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 1440 800"
+          >
+            <path
+              fill="rgba(255,255,255,0.1)"
+              d="M1440 0v800L720 400 0 800V0l720 400L1440 0z"
             />
+          </svg>
+        </div>
+        <div className="relative z-10 flex items-center justify-center h-full text-white">
+          <div className="text-center">
+            <motion.h1 
+              className="text-5xl font-bold mb-3 tracking-tight"
+              initial={{ y: -50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+            >
+              Bright Smile Dental Clinic
+            </motion.h1>
+            <motion.p 
+              className="mb-6 text-lg font-light"
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+            >
+              Experience world-class dental care with our expert team
+            </motion.p>
+            <motion.button 
+              className="bg-white text-blue-700 px-8 py-3 rounded-full font-bold text-sm hover:bg-blue-100 transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Book Your Appointment Now
+            </motion.button>
           </div>
         </div>
-      </motion.section>
+      </section>
 
       {/* Services Section */}
-      <motion.section
-        className="py-16"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 1.5 }}
-      >
-        <div className="container mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-10">Our Services</h2>
-          <div className="flex justify-around">
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-5xl font-bold text-center mb-16 text-gray-800">Our Services</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { name: "General Dentistry", icon: FaTooth },
-              { name: "Cosmetic Dentistry", icon: FaSmile },
-              { name: "Orthodontics", icon: FaTeeth },
+              { name: "General Dentistry", icon: FaTooth, description: "Comprehensive care for your overall oral health" },
+              { name: "Cosmetic Dentistry", icon: FaSmile, description: "Enhance your smile with our aesthetic treatments" },
+              { name: "Orthodontics", icon: FaTeeth, description: "Achieve a perfectly aligned and beautiful smile" },
             ].map((service, index) => (
-              <motion.div
-                key={index}
-                className="text-center"
-                whileHover={{ scale: 1.05 }}
+              <motion.div 
+                key={index} 
+                className="flex flex-col items-center bg-gray-50 p-8 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
+                whileHover={{ y: -5 }}
               >
-                <div className="bg-blue-100 rounded-full p-6 inline-block mb-4">
-                  <service.icon size={40} className="text-blue-500" />
+                <div className="bg-blue-100 rounded-full p-6 inline-block mb-6">
+                  <service.icon size={48} className="text-blue-600" />
                 </div>
-                <h3 className="text-xl font-semibold">{service.name}</h3>
+                <h3 className="text-2xl font-semibold text-gray-800 mb-4">{service.name}</h3>
+                <p className="text-gray-600 text-center">{service.description}</p>
               </motion.div>
             ))}
           </div>
         </div>
-      </motion.section>
+      </section>
 
-      {/* Why Choose Us Section */}
-      <motion.section
-        className="bg-gray-100 py-16"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 2 }}
-      >
-        <div className="container mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-10">
-            Why Choose Us
-          </h2>
+      {/* Advanced Technology Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <h2 className="text-4xl font-bold text-center mb-12 text-gray-800">Advanced Dental Technology</h2>
           <div className="grid grid-cols-3 gap-8">
             {[
-              {
-                icon: FaCalendar,
-                title: "Easy Scheduling",
-                description: "Book your appointments online with ease.",
-              },
-              {
-                icon: FaClock,
-                title: "Extended Hours",
-                description:
-                  "We offer flexible hours to fit your busy schedule.",
-              },
-              {
-                icon: FaPhoneAlt,
-                title: "24/7 Support",
-                description:
-                  "Our team is always available to answer your questions.",
-              },
-            ].map((item, index) => (
-              <motion.div
+              { name: "3D Imaging", icon: FaChartLine, description: "High-precision 3D scans for accurate diagnoses" },
+              { name: "Laser Dentistry", icon: FaMicroscope, description: "Minimally invasive procedures with faster healing" },
+              { name: "Digital Impressions", icon: FaHeartbeat, description: "Comfortable and precise digital mouth impressions" },
+            ].map((tech, index) => (
+              <motion.div 
                 key={index}
-                className="bg-white p-6 rounded-lg shadow-md text-center"
-                whileHover={{ scale: 1.05 }}
+                className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
+                whileHover={{ scale: 1.03 }}
               >
-                <item.icon size={40} className="text-blue-500 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
-                <p>{item.description}</p>
+                <div className="bg-blue-100 rounded-full p-3 inline-block mb-4">
+                  <tech.icon size={24} className="text-blue-600" />
+                </div>
+                <h3 className="text-lg font-semibold mb-3 text-gray-800">{tech.name}</h3>
+                <p className="text-gray-600 text-sm mb-4">{tech.description}</p>
+                <a 
+                  href="https://www.google.com/search?q=advanced+dental+technology" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center text-blue-600 text-sm font-semibold hover:text-blue-800 transition duration-300"
+                >
+                  Read More <FaArrowRight className="ml-2" size={12} />
+                </a>
               </motion.div>
             ))}
           </div>
         </div>
-      </motion.section>
+      </section>
 
       {/* About Us Section */}
-      <motion.section
-        className="bg-gray-100 py-16"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 2.5 }}
-      >
-        <div className="container mx-auto flex items-center">
-          <div className="w-1/2">
-            <img
-              src={img2}
-              alt="Dental Team"
-              className="rounded-lg shadow-lg"
-            />
-          </div>
-          <div className="w-1/2 pr-12">
-            <h2 className="text-3xl font-bold mb-4">About Us</h2>
-            <p className="mb-6">
-              We are a team of specialized dentists committed to providing the
-              highest level of care for our patients' oral health.
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4 flex items-center">
+          <motion.div 
+            className="w-1/2"
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <img src={img2} alt="Dental Team" className="rounded-lg shadow-xl" />
+          </motion.div>
+          <div className="w-1/2 pl-12">
+            <h2 className="text-4xl font-bold mb-6 text-gray-800">About Us</h2>
+            <p className="mb-6 text-gray-600 leading-relaxed">
+              We are a team of specialized dentists committed to providing the highest level of care for our patients' oral health. With years of experience and cutting-edge technology, we ensure that every visit is comfortable and effective.
             </p>
-            <button className="bg-blue-500 text-white px-6 py-2 rounded-full font-bold hover:bg-blue-600">
+            <motion.button 
+              className="bg-blue-600 text-white px-8 py-3 rounded-full font-bold text-sm hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
               Learn More
-            </button>
+            </motion.button>
           </div>
         </div>
-      </motion.section>
+      </section>
 
-      {/* Dentists Section */}
-      <motion.section
-        className="py-16"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 3 }}
-      >
-        <div className="container mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-10">
-            Our Medical Team
-          </h2>
-          <div className="grid grid-cols-4 gap-8">
-            {dentists.map((dentist, index) => (
-              <motion.div
-                key={index}
-                className="text-center"
-                whileHover={{ scale: 1.05 }}
+      {/* Our Medical Team Section */}
+      <section className="py-16 bg-gray-50">
+  <div className="container mx-auto px-4">
+    <h2 className="text-4xl font-bold text-center mb-12 text-gray-800">Our Medical Team</h2>
+    {loading ? (
+      <p className="text-center text-gray-600">Loading doctors...</p>
+    ) : error ? (
+      <p className="text-center text-red-600">{error}</p>
+    ) : (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {doctors.map((doctor) => (
+          <motion.div 
+            key={doctor.id} 
+            className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col items-center"
+            whileHover={{ y: -5 }}
+            onClick={() => handleDoctorClick(doctor.id)} // Add your onClick event here
+          >
+            <div className="w-32 h-32 bg-blue-100 rounded-full mb-6 flex items-center justify-center overflow-hidden">
+              {doctor.image ? (
+                <img src={doctor.image} alt={doctor.name} className="w-full h-full object-cover" />
+              ) : (
+                <FaUserMd size={48} className="text-blue-600" />
+              )}
+            </div>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">{doctor.name}</h3>
+            <p className="text-gray-600 text-sm mb-2">{doctor.email}</p>
+            <p className="text-gray-600 text-sm mb-2">{doctor.hospital_name}</p>
+            <p className="text-gray-600 text-sm mb-2">{doctor.phone_number}</p>
+            <p className="text-gray-600 text-sm text-center">{doctor.address}</p>
+          </motion.div>
+        ))}
+      </div>
+    )}
+  </div>
+</section>
+
+
+      {/* Testimonials Section */}
+      <section className="bg-blue-50 py-16">
+        <div className="container mx-auto px-4">
+          <h2 className="text-4xl font-bold text-center mb-12 text-gray-800">What Our Patients Say</h2>
+          <div className="grid grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <motion.div 
+                key={index} 
+                className="bg-white p-6 rounded-lg relative shadow-md"
+                whileHover={{ scale: 1.03 }}
               >
-                <img
-                  src={img3}
-                  alt={dentist.name}
-                  className="rounded-full mx-auto mb-4 w-32 h-32 object-cover"
-                />
-                <h3 className="text-xl font-semibold">{dentist.name}</h3>
-                <p className="text-gray-600">{dentist.specialty}</p>
+                <FaQuoteRight className="text-blue-200 text-3xl absolute top-3 right-3" />
+                <p className="mb-4 text-sm leading-relaxed text-gray-600">{testimonial.text}</p>
+                <p className="font-semibold text-sm text-gray-800">- {testimonial.name}</p>
               </motion.div>
             ))}
           </div>
         </div>
-      </motion.section>
-      
-     
+      </section>
 
+      {/* Latest News Section */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-4xl font-bold text-center mb-12 text-gray-800">Latest News</h2>
+          <div className="grid grid-cols-3 gap-8">
+            {news.map((item, index) => (
+              <motion.div 
+                key={index} 
+                className="bg-gray-50 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
+                whileHover={{ y: -5 }}
+              >
+                <div className="h-40 bg-blue-100 flex items-center justify-center">
+                  <FaNewspaper size={40} className="text-blue-600" />
+                </div>
+                <div className="p-6">
+                  <h3 className="text-lg font-semibold mb-3 text-gray-800">{item.title}</h3>
+                  <p className="text-blue-600 flex items-center text-sm">
+                    <FaCalendarAlt className="mr-2" size={12} /> {item.date}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Past Appointments Section */}
+      
+
+      {/* Contact Us Section */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-4xl font-bold text-center mb-12 text-gray-800">Contact Us</h2>
+          <div className="max-w-2xl mx-auto bg-gray-50 rounded-lg shadow-md p-8">
+            <form>
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                  <input type="text" id="name" name="name" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                  <input type="email" id="email" name="email" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+              </div>
+              <div className="mt-6">
+                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                <textarea id="message" name="message" rows="4" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+              </div>
+              <div className="mt-6">
+                <motion.button 
+                  type="submit"
+                  className="w-full bg-blue-600 text-white py-3 rounded-full font-bold text-sm hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Send Message
+                </motion.button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
       <Footer />
-    </motion.div>
+
+      {/* Scroll to Top Button */}
+      <motion.button
+        className="fixed bottom-8 right-8 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition duration-300 ease-in-out"
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+        </svg>
+      </motion.button>
+    </div>
   );
 };
 
