@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday } from 'date-fns';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, Clock } from 'lucide-react';
 import axios from 'axios';
 import AppointmentFormPopup from './AppointmentFormPopup';
 import 'react-calendar/dist/Calendar.css';
 import WelcomingAppointment from './WelcomingAppointment';
+import AppointmentActions from './AppointmentActions';
 
 const AppointmentForDoctor = () => {
   const [availability, setAvailability] = useState([]);
@@ -15,20 +16,25 @@ const AppointmentForDoctor = () => {
   const [nextAppointment, setNextAppointment] = useState(null);
   const [latestPreviousAppointment, setLatestPreviousAppointment] = useState(null);
 
-  useEffect(() => {
-    const fetchAvailability = async () => {
-      try {
-        const response = await axios.get('http://localhost:4025/api/availability/1');
-        setAvailability(response.data);
-        setNextAppointment(findNextAppointment(response.data));
-        setLatestPreviousAppointment(findLatestPreviousAppointment(response.data));
-      } catch (error) {
-        console.error('Error fetching availability:', error);
-      }
-    };
+  const storedUser = sessionStorage.getItem('user');
+  const userObject = JSON.parse(storedUser);
+  const doctorId = userObject.id;
 
+
+  const fetchAvailability = useCallback(async () => {
+    try {
+      const response = await axios.get(`http://localhost:4025/api/availability/${doctorId}`);
+      setAvailability(response.data);
+      setNextAppointment(findNextAppointment(response.data));
+      setLatestPreviousAppointment(findLatestPreviousAppointment(response.data));
+    } catch (error) {
+      console.error('Error fetching availability:', error);
+    }
+  }, [doctorId]);
+
+  useEffect(() => {
     fetchAvailability();
-  }, []);
+  }, [fetchAvailability]);
 
   const formatDate = (date) => {
     const utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
@@ -52,12 +58,12 @@ const AppointmentForDoctor = () => {
 
   const findNextAppointment = (appointments) => {
     const now = new Date();
-    return appointments.find(app => new Date(app.date) > now);
+    return appointments.find(app => new Date(app.date) > now && app.is_booked);
   };
 
   const findLatestPreviousAppointment = (appointments) => {
     const now = new Date();
-    const pastAppointments = appointments.filter(app => new Date(app.date) < now);
+    const pastAppointments = appointments.filter(app => new Date(app.date) < now && app.is_booked);
     return pastAppointments.sort((a, b) => new Date(b.date) - new Date(a.date))[0];
   };
 
@@ -76,16 +82,30 @@ const AppointmentForDoctor = () => {
     if (!isSameMonth(day, currentDate)) classes += " text-gray-300";
     if (isSameDay(day, selectedDate)) classes += " bg-blue-500 text-white";
     if (isToday(day)) classes += " border-2 border-blue-500";
-    if (availability.some(app => isSameDay(new Date(app.date), day))) {
-      classes += " bg-yellow-300";
+    const appointmentForDay = availability.find(app => isSameDay(new Date(app.date), day));
+    if (appointmentForDay) {
+      if (appointmentForDay.is_booked) {
+        classes += " bg-red-300";
+      } else {
+        classes += " bg-yellow-300";
+      }
     }
     return classes;
+  };
+
+  const handleEditSuccess = async (updatedAvailability) => {
+    await fetchAvailability();
+    fetchAvailabilityForDate(selectedDate);
+  };
+
+  const handleDeleteSuccess = async (availabilityId) => {
+    await fetchAvailability();
+    fetchAvailabilityForDate(selectedDate);
   };
 
   return (
     <div className="bg-gray-100 min-h-screen p-8">
       <WelcomingAppointment />
-      
       <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-md overflow-hidden mt-8">
         <div className="p-8">
           <div className="flex justify-between items-center mb-6">
@@ -157,18 +177,25 @@ const AppointmentForDoctor = () => {
               <ul className="space-y-4">
                 {appointmentsForDate.length > 0 ? (
                   appointmentsForDate.map((appointment) => (
-                    <li key={appointment.id} className="flex items-start p-3 bg-gray-50 rounded-lg">
-                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-                        <Clock className="h-6 w-6 text-blue-500" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-800">{appointment.time_slot}</p>
-                        <p className="text-sm text-gray-500">{appointment.is_available ? 'Available' : 'Booked'}</p>
+                    <li key={appointment.id} className="border border-gray-200 p-4 rounded-lg shadow-sm">
+                      <div className="flex justify-between">
+                        <div>
+                          <h3 className="font-semibold text-lg text-gray-800">{appointment.time_slot}</h3>
+                          <p className="text-sm text-gray-600">Doctor: Dr. {appointment.doctorName || 'Smith'}</p>
+                          <p className={`text-sm ${appointment.is_booked ? 'text-red-600' : 'text-green-600'}`}>
+                            {appointment.is_booked ? 'Booked' : 'Available'}
+                          </p>
+                        </div>
+                        <AppointmentActions
+                          appointment={appointment}
+                          onEditSuccess={handleEditSuccess}
+                          onDeleteSuccess={handleDeleteSuccess}
+                        />
                       </div>
                     </li>
                   ))
                 ) : (
-                  <li className="text-gray-500">No appointments available for this date.</li>
+                  <p className="text-sm text-gray-600">No appointments available for this day.</p>
                 )}
               </ul>
             </div>
@@ -179,7 +206,11 @@ const AppointmentForDoctor = () => {
       {showPopup && (
         <AppointmentFormPopup
           onClose={() => setShowPopup(false)}
-          selectedDate={selectedDate}
+          doctorId={doctorId}
+          onAddSuccess={(newAppointment) => {
+            setAvailability([...availability, newAppointment]);
+            fetchAvailabilityForDate(selectedDate);
+          }}
         />
       )}
     </div>

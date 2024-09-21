@@ -12,6 +12,10 @@ const medicalRecordsRoutes = require("./routes/MedicalRecordsRoutes");
 const doctorroutes=require('./routes/doctorsroutes');
 const doctorAvailabilityRoutes = require('./routes/doctorAvailabilityRoutes')
 
+const doctorAppointmentRoute = require('./routes/doctorAppointment')
+
+
+
 require('dotenv').config();
 
 const app = express();
@@ -30,6 +34,8 @@ app.use('/api/doctors', doctorroutes);
 
 //tasneem routes
 app.use('/api', doctorAvailabilityRoutes);
+app.use('/api', doctorAppointmentRoute);
+
 
 
 
