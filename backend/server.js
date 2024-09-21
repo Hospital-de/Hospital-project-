@@ -1,103 +1,65 @@
+
+
+
+
+const admain = require("./routes/admainRoutes");
 const express = require('express');
 const cors = require('cors');
+const http = require('http');
 const pool = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const contactUsRoutes = require('./routes/contactUsRoutes');
 const paymentRoutes = require("./routes/PayPalRoutes");
 
+const chatRoutes = require('./routes/chatroutes');
+const setupSocketIO = require('./socketHandler');
+
+const profileRoutes = require("./routes/profileRoutes");
+const appointmentRoutes = require("./routes/appointmentRoutes");
+const medicalRecordsRoutes = require("./routes/MedicalRecordsRoutes");
+const doctorroutes=require('./routes/doctorsroutes');
+const doctorAvailabilityRoutes = require('./routes/doctorAvailabilityRoutes')
+const doctorAppointmentRoute = require('./routes/doctorAppointment')
+
 require('dotenv').config();
-const paypalRoutes = require('./routes/PayPalRoutes');
+
 const app = express();
+const server = http.createServer(app);
+const io = setupSocketIO(server);
+
 const PORT = process.env.PORT || 4025;
 
 app.use(cors());
 app.use(express.json());
-
-
-app.use('/paypal', paypalRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/doctors', doctorRoutes);
+app.use('/api/chat', chatRoutes);
+app.use("/api/admain", admain);
+app.use("/api/profile", profileRoutes);
+app.use("/api/appointments", appointmentRoutes);
+app.use("/api/medical-records", medicalRecordsRoutes);
+
+//tasneem routes
+app.use('/api', doctorAvailabilityRoutes);
+app.use('/api', doctorAppointmentRoute);
+
+
 app.use('/api/contact-us', contactUsRoutes);
 app.use("/api/payments", paymentRoutes);
 pool.connect((err) => {
   if (err) {
-    console.error('Error connecting to the database:', err);
+    console.error("Error connecting to the database:", err);
   } else {
-    console.log('Connected to the PostgreSQL database');
+    console.log("Connected to the PostgreSQL database");
   }
 });
-// //pasce/////////////////////
-// // PayPal configuration
-// const clientId = 'AZZnJo9B4ulFid8Kdc6--QozivoXGg7263KyHe5KFomW-t-qQQ4cWR7l2lFScv10s0N_iq-DQpewLwDJ';
-// const clientSecret = 'EGVs4UDLD0sZ9fKq69TO2mJkqpR1ZOUt2gRWi36yLdGWFSjKNoEc_pJe6Wq7b0-Jn0UeZ2LNIMnIN_nv';
-
-// const environment = new paypal.core.SandboxEnvironment(clientId, clientSecret);
-// const client = new paypal.core.PayPalHttpClient(environment);
-
-// // Create PayPal order
-// app.post('/create-order', async (req, res) => {
-//   const { amount } = req.body;
-//   const request = new paypal.orders.OrdersCreateRequest();
-//   request.prefer("return=representation");
-//   request.requestBody({
-//     intent: 'CAPTURE',
-//     purchase_units: [{
-//       amount: {
-//         currency_code: 'USD',
-//         value: amount
-//       }
-//     }]
-//   });
-
-//   try {
-//     const order = await client.execute(request);
-//     res.json({ id: order.result.id });
-//   } catch (error) {
-//     console.error('Error creating PayPal order:', error);
-//     res.status(500).json({ error: 'Failed to create PayPal order.' });
-//   }
-// });
-
-// // Capture PayPal order and save to database
-// app.post('/capture-order', async (req, res) => {
-//   const { orderId, userId, amount, appointmentId } = req.body;
-//   console.log(req.body)
-//   const request = new paypal.orders.OrdersCaptureRequest(orderId);
-//   request.requestBody({});
-
-//   try {
-//     const capture = await client.execute(request);
-//     const paymentStatus = capture.result.status;
-
-//     if (paymentStatus !== 'COMPLETED') {
-//       return res.status(400).json({ error: 'Order not completed' });
-//     }
-
-//     const query = `
-//       INSERT INTO Payments (user_id, amount, payment_status, appointment_id)
-//       VALUES ($1, $2, $3, $4) RETURNING *;
-//     `;
-//     const values = [1, amount, paymentStatus, 1];
-
-//     const result = await pool.query(query, values);
-    
-//     res.json({
-//       captureId: capture.result.id,
-//       status: paymentStatus,
-//       payer: capture.result.payer,
-//       dbResult: result.rows[0]
-//     });
-
-//   } catch (error) {
-//     console.error('Error capturing PayPal order:', error);
-//     res.status(500).json({ error: 'Failed to capture PayPal order.' });
-//   }
-// });
 
 
 
 
 
 
-app.listen(PORT, () => {
+
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
