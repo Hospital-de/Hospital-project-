@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Home, Users, Calendar, Star, Menu, Settings, LogOut } from 'lucide-react';
 
+
 const Sidebar = ({ setSelectedComponent }) => {
+
   const [isExpanded, setIsExpanded] = useState(false);
   const sidebarRef = useRef(null);
 
@@ -28,8 +30,10 @@ const Sidebar = ({ setSelectedComponent }) => {
   }, [isExpanded]);
 
   const menuItems = [
+
     { name: 'Dashboard', icon: Home, component: 'dashboard' },
     { name: 'Appointments', icon: Calendar, component: 'appointments' },
+
   ];
 
   return (
@@ -53,8 +57,10 @@ const Sidebar = ({ setSelectedComponent }) => {
       <ul className="space-y-2">
         {menuItems.map((item) => (
           <li key={item.name} className="px-4">
+
             <button
               onClick={() => setSelectedComponent(item.component)}
+
               className={`flex items-center py-3 px-2 rounded-lg transition-colors ${
                 isExpanded ? 'hover:bg-indigo-600' : 'justify-center hover:bg-indigo-600'
               }`}
@@ -67,13 +73,18 @@ const Sidebar = ({ setSelectedComponent }) => {
               >
                 {item.name}
               </span>
+
             </button>
+
           </li>
         ))}
       </ul>
 
       <div className="absolute bottom-4 left-0 right-0 px-4">
+
+
         <button
+
           className={`flex items-center py-3 px-2 rounded-lg transition-colors ${
             isExpanded ? 'hover:bg-indigo-600' : 'justify-center hover:bg-indigo-600'
           }`}
@@ -86,10 +97,14 @@ const Sidebar = ({ setSelectedComponent }) => {
           >
             Logout
           </span>
+
         </button>
+
       </div>
     </nav>
   );
 };
 
+
 export default Sidebar;
+
