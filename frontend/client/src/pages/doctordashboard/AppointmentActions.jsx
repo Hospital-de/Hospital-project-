@@ -6,6 +6,12 @@ const AppointmentActions = ({ appointment, onEditSuccess, onDeleteSuccess }) => 
   const [isEditing, setIsEditing] = useState(false);
   const [editedAppointment, setEditedAppointment] = useState(appointment);
 
+
+  const storedUser = sessionStorage.getItem('user');  // Get the stored user as a string
+  const userObject = JSON.parse(storedUser);  // Convert the string back to an object
+  const doctorId = userObject.id;  // Access the doctor's ID
+
+
   const handleEdit = async () => {
     if (isEditing) {
       try {

@@ -1,37 +1,37 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchAppointments } from '../../redux/slices/appointmentsSlice';
 import { Calendar, MessageSquare, Users, Activity, Plus, Bell, Sun, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
-import axios from 'axios';
 
 const InformationMain = () => {
-  const [appointmentsData, setAppointmentsData] = useState({ total_appointments: 0, total_patients: 0, appointments: [] });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const dispatch = useDispatch();
+  const { appointmentsData, status, error } = useSelector((state) => state.appointments);
+  const { total_appointments, total_patients, appointments } = appointmentsData;
+
+  const [doctorName, setDoctorName] = useState('');
 
   useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        const doctorId = 1; // Replace with the actual doctor ID you want to fetch
-        const response = await axios.get(`http://localhost:4025/api/appointments/${doctorId}`);
-        
-        // Simulate a longer loading time (3 seconds)
-        setTimeout(() => {
-          setAppointmentsData(response.data);
-          setLoading(false);
-        }, 3000);
-      } catch (err) {
-        // Simulate a delay before showing the error as well
-        setTimeout(() => {
-          setError('Failed to fetch appointments');
-          setLoading(false);
-        }, 3000);
-      }
+    const fetchData = async () => {
+      const storedUser = sessionStorage.getItem('user');
+      const userObject = JSON.parse(storedUser);
+      const doctorId = userObject.id;
+
+      setDoctorName(userObject.name); // Set the doctor's name
+
+      dispatch(fetchAppointments(doctorId));
     };
 
-    fetchAppointments();
-  }, []);
+    fetchData();
+  }, [dispatch]);
 
-  const { total_appointments, total_patients, appointments } = appointmentsData;
+  if (status === 'loading') {
+    return <div>Loading...</div>;
+  }
+
+  if (status === 'failed') {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <motion.div 
@@ -47,7 +47,7 @@ const InformationMain = () => {
             <h1 className="text-3xl font-bold text-gray-800 flex items-center">
               Good Morning <Sun className="ml-2 text-yellow-500" />
             </h1>
-            <h2 className="text-2xl font-semibold text-blue-600">Dr. Arkali Moorthi</h2>
+            <h2 className="text-2xl font-semibold text-blue-600">{doctorName ? `Dr. ${doctorName}` : 'Doctor'}</h2>
             <p className="text-gray-600 flex items-center">Have a nice day at work <Activity className="ml-2 text-green-500" size={16} /></p>
           </motion.div>
           <div className="flex space-x-4 items-center">
@@ -113,7 +113,7 @@ const InformationMain = () => {
                   <AppointmentRow
                     key={appointment.appointment_id}
                     name={appointment.patient_name}
-                    gender="Female" 
+                    gender="Female"  // Assuming this data is not provided by the API
                     date={appointment.appointment_date}
                     time={appointment.appointment_time}
                     status={appointment.status}
@@ -157,7 +157,7 @@ const AppointmentRow = ({ name, gender, date, time, status }) => (
     <td className="py-4 px-4">{date}</td>
     <td className="py-4 px-4">{time}</td>
     <td className="py-4 px-4">
-      <span className={`text-sm px-2 py-1 rounded-full ${status === 'Completed' ? 'bg-green-100 text-green-600' : 'bg-red-500 text-red-100'}`}>
+      <span className={`text-sm px-2 py-1 rounded-full ${status === 'Completed' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
         {status}
       </span>
     </td>

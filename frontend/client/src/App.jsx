@@ -4,13 +4,14 @@ import { useSelector } from 'react-redux';
 import Signup from '../src/signup';
 import Login from '../src/login';
 import Home from '../src/home';
-import DoctorDashboard from '../src/doctordashboard';
 
 import DoctorDashboardMain from './pages/doctordashboard/DoctorDashboardMain';
 
 import Header from './components/Header';
 import Footer from './components/Footer';
 import UserProfile from './pages/UserProfile';
+
+import Appointmentforusertestfile from './pages/Appointmentforusertestfile';
 
 
 const PrivateRoute = ({ children, allowedRoles }) => {
@@ -46,15 +47,16 @@ function App() {
             }
           />
           <Route
-            path="/doctor-dashboard"
+            path="/DoctorDashboardMain"
             element={
               <PrivateRoute allowedRoles={["Doctor"]}>
-                <DoctorDashboard />
+                <DoctorDashboardMain />
               </PrivateRoute>
             }
           />
 
-               <Route path="/DoctorDashboardMain" element={<DoctorDashboardMain />} />
+<Route path="/Appointmentforusertestfile" element={<Appointmentforusertestfile/>} />
+
 
         </Routes>
       </div>

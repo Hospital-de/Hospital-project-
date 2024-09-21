@@ -30,7 +30,7 @@ const getDoctorAvailability = async (req, res) => {
     return res.status(400).json({ error: 'doctor_id is required' });
   }
 
-  let query = `SELECT * FROM DoctorAvailability WHERE doctor_id = $1 AND is_deleted = FALSE AND is_booked = FALSE`;
+  let query = `SELECT * FROM DoctorAvailability WHERE doctor_id = $1 AND is_deleted = FALSE `;
   let values = [doctorId];
 
   if (date) {
@@ -96,9 +96,26 @@ const deleteDoctorAvailability = async (req, res) => {
   }
 };
 
+const getAllDoctorAvailability = async (req, res) => {
+  try {
+      const result = await pool.query(`
+          SELECT da.id, da.doctor_id, u.name as doctor_name, da.date, da.time_slot, da.is_available, da.is_booked
+          FROM DoctorAvailability da
+          JOIN Users u ON da.doctor_id = u.id
+          WHERE da.is_deleted = FALSE
+          ORDER BY da.date, da.time_slot;
+      `);
+      res.status(200).json(result.rows);
+  } catch (error) {
+      console.error('Error fetching availability:', error);
+      res.status(500).json({ message: 'Server error fetching availability' });
+  }
+};
+
 module.exports = {
   addDoctorAvailability,
   getDoctorAvailability,
   editDoctorAvailability,
-  deleteDoctorAvailability
+  deleteDoctorAvailability,
+  getAllDoctorAvailability
 };

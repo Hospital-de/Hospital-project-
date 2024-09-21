@@ -1,5 +1,9 @@
 const pool = require('../config/db');
 
+
+/// for main dashboard 
+
+
 // Fetch appointments for a specific doctor and include total count of appointments and unique patients
 exports.getDoctorAppointments = async (req, res) => {
     const { doctorId } = req.params;
@@ -62,3 +66,69 @@ exports.getDoctorAppointments = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
+
+
+
+/////////// appointment for user 
+
+// Function to book an appointment
+
+exports.bookAppointment = async (req, res) => {
+    const { patient_id, doctor_id, availability_id, notes } = req.body;
+  
+    try {
+      // Start a transaction
+      await pool.query('BEGIN');
+  
+      // 1. Update DoctorAvailability table to mark the appointment as booked
+      const updateQuery = `
+        UPDATE DoctorAvailability 
+        SET is_booked = true 
+        WHERE id = $1 AND doctor_id = $2 AND is_available = true AND is_booked = false 
+        RETURNING *;
+      `;
+      const updateResult = await pool.query(updateQuery, [availability_id, doctor_id]);
+  
+      // Check if the slot was successfully booked
+      if (updateResult.rows.length === 0) {
+        await pool.query('ROLLBACK');
+        return res.status(400).json({ message: 'Appointment slot already booked or not available.' });
+      }
+  
+      // 2. Insert into Appointments table
+      const insertQuery = `
+        INSERT INTO Appointments (patient_id, doctor_id, availability_id, notes)
+        VALUES ($1, $2, $3, $4)
+        RETURNING *;
+      `;
+      const appointmentResult = await pool.query(insertQuery, [patient_id, doctor_id, availability_id, notes]);
+  
+      // 3. Fetch doctor's name
+      const doctorQuery = `
+        SELECT name FROM Users WHERE id = $1;
+      `;
+      const doctorResult = await pool.query(doctorQuery, [doctor_id]);
+  
+      // Commit the transaction
+      await pool.query('COMMIT');
+  
+      // Send the response back to the client
+      return res.status(201).json({
+        message: 'Appointment booked successfully.',
+        appointment: {
+          ...appointmentResult.rows[0],
+          doctor_name: doctorResult.rows[0]?.name || 'Unknown',
+          date: updateResult.rows[0].date,
+          time_slot: updateResult.rows[0].time_slot
+        },
+      });
+    } catch (error) {
+      // Rollback the transaction in case of error
+      await pool.query('ROLLBACK');
+      console.error('Error booking appointment:', error);
+      if (error.constraint === 'appointments_patient_id_doctor_id_availability_id_key') {
+        return res.status(400).json({ message: 'You have already booked this appointment.' });
+      }
+      return res.status(500).json({ message: 'Internal server error.' });
+    }
+  };

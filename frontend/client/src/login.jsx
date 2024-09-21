@@ -22,7 +22,7 @@ const Login = () => {
     const result = await dispatch(login(formData));
     if (!result.error) {
       const role = result.payload.user.role;
-      navigate(role === 'Patient' ? '/' : '/doctor-dashboard');
+      navigate(role === 'Patient' ? '/' : '/DoctorDashboardMain');
     }
   };
 

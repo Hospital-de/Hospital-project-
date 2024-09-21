@@ -13,6 +13,16 @@ const AppointmentFormPopup = ({ onClose, selectedDate }) => {
   const [isAvailable, setIsAvailable] = useState(true);
   const [error, setError] = useState('');
 
+
+
+
+  const storedUser = sessionStorage.getItem('user');  // Get the stored user as a string
+  const userObject = JSON.parse(storedUser);  // Convert the string back to an object
+  const doctorId = userObject.id;  // Access the doctor's ID
+
+
+
+  
   const hours = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0'));
   const minutes = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'));
 

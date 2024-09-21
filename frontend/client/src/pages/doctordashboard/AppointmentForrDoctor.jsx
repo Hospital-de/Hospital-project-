@@ -1,4 +1,4 @@
-import React, { useState, useEffect , useCallback} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday } from 'date-fns';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, Clock } from 'lucide-react';
 import axios from 'axios';
@@ -15,8 +15,11 @@ const AppointmentForDoctor = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [nextAppointment, setNextAppointment] = useState(null);
   const [latestPreviousAppointment, setLatestPreviousAppointment] = useState(null);
-  
-  const doctorId = 1;
+
+  const storedUser = sessionStorage.getItem('user');
+  const userObject = JSON.parse(storedUser);
+  const doctorId = userObject.id;
+
 
   const fetchAvailability = useCallback(async () => {
     try {
@@ -55,12 +58,12 @@ const AppointmentForDoctor = () => {
 
   const findNextAppointment = (appointments) => {
     const now = new Date();
-    return appointments.find(app => new Date(app.date) > now);
+    return appointments.find(app => new Date(app.date) > now && app.is_booked);
   };
 
   const findLatestPreviousAppointment = (appointments) => {
     const now = new Date();
-    const pastAppointments = appointments.filter(app => new Date(app.date) < now);
+    const pastAppointments = appointments.filter(app => new Date(app.date) < now && app.is_booked);
     return pastAppointments.sort((a, b) => new Date(b.date) - new Date(a.date))[0];
   };
 
@@ -79,8 +82,13 @@ const AppointmentForDoctor = () => {
     if (!isSameMonth(day, currentDate)) classes += " text-gray-300";
     if (isSameDay(day, selectedDate)) classes += " bg-blue-500 text-white";
     if (isToday(day)) classes += " border-2 border-blue-500";
-    if (availability.some(app => isSameDay(new Date(app.date), day))) {
-      classes += " bg-yellow-300";
+    const appointmentForDay = availability.find(app => isSameDay(new Date(app.date), day));
+    if (appointmentForDay) {
+      if (appointmentForDay.is_booked) {
+        classes += " bg-red-300";
+      } else {
+        classes += " bg-yellow-300";
+      }
     }
     return classes;
   };
@@ -174,6 +182,9 @@ const AppointmentForDoctor = () => {
                         <div>
                           <h3 className="font-semibold text-lg text-gray-800">{appointment.time_slot}</h3>
                           <p className="text-sm text-gray-600">Doctor: Dr. {appointment.doctorName || 'Smith'}</p>
+                          <p className={`text-sm ${appointment.is_booked ? 'text-red-600' : 'text-green-600'}`}>
+                            {appointment.is_booked ? 'Booked' : 'Available'}
+                          </p>
                         </div>
                         <AppointmentActions
                           appointment={appointment}
@@ -205,6 +216,5 @@ const AppointmentForDoctor = () => {
     </div>
   );
 };
-
 
 export default AppointmentForDoctor;

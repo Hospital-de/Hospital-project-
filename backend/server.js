@@ -3,7 +3,7 @@ const cors = require('cors');
 const pool = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const doctorAvailabilityRoutes = require('./routes/doctorAvailabilityRoutes')
-const doctorAppointmentRoute = require('./routes/doctorAppointmentRoute')
+const doctorAppointmentRoute = require('./routes/doctorAppointment')
 require('dotenv').config();
 
 const app = express();

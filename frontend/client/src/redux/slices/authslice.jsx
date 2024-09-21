@@ -15,6 +15,7 @@ export const signup = createAsyncThunk(
     try {
       const response = await axios.post("http://localhost:4025/api/auth/signup", userData);
       localStorage.setItem("token", response.data.token);
+      sessionStorage.setItem("user", JSON.stringify(response.data.user));
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -28,12 +29,15 @@ export const login = createAsyncThunk(
     try {
       const response = await axios.post("http://localhost:4025/api/auth/login", credentials);
       localStorage.setItem("token", response.data.token);
+      sessionStorage.setItem("user", JSON.stringify(response.data.user));
+      console.log(response.data.user)
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
   }
 );
+
 
 const authSlice = createSlice({
   name: "auth",
