@@ -5,12 +5,17 @@ import Signup from '../src/signup';
 import Login from '../src/login';
 import Home from '../src/home';
 import DoctorDashboard from '../src/doctordashboard';
-
-import DoctorDashboardMain from '../pages/doctordashboard/DoctorDashboardMain';
+import { PayPalScriptProvider } from "@paypal/react-paypal-js";
+import DoctorDashboardMain from './pages/doctordashboard/DoctorDashboardMain';
 
 import Header from './components/Header';
 import Footer from './components/Footer';
-import UserProfile from './components/pages/UserProfile';
+import UserProfile from './pages/UserProfile';
+import ContactUs from './pages/contactUs';
+
+import AboutUs from './pages/aboutUs';
+import PayPalPayment from './components/PayPalPayment';
+
 
 
 const PrivateRoute = ({ children, allowedRoles }) => {
@@ -29,14 +34,29 @@ const PrivateRoute = ({ children, allowedRoles }) => {
 
 function App() {
   return (
+
     <Router>
+
+
       <div className="App">
+
+      <PayPalScriptProvider options={{ "client-id": "AZZnJo9B4ulFid8Kdc6--QozivoXGg7263KyHe5KFomW-t-qQQ4cWR7l2lFScv10s0N_iq-DQpewLwDJ" }}>
+      <PayPalPayment amount="10.00" userId="123" appointmentId="456" />
         <Routes>
+
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
           <Route path="/header" element={<Header />} />
           <Route path="/footer" element={<Footer />} />
           <Route path="/profile" element={<UserProfile />} />
+          <Route path="/contact" element={<ContactUs />} />
+          <Route path="/about" element={<AboutUs />} />
+          
+         
+    
+     
+         
+        
           <Route
             path="/"
             element={
@@ -57,7 +77,9 @@ function App() {
                <Route path="/DoctorDashboardMain" element={<DoctorDashboardMain />} />
 
         </Routes>
+        </PayPalScriptProvider>
       </div>
+   
     </Router>
   );
 }
