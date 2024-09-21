@@ -1,7 +1,7 @@
 import React from 'react';
 import { Calendar, MessageSquare, Users, Activity, Plus, Bell } from 'lucide-react';
 
-const DoctorDashboard = () => {
+const InformationMain = () => {
   return (
     <div className="rounded-xl  min-h-screen mt-12">
       <div className="rounded-xl shadow-md bg-gray-100  p-10">
@@ -97,4 +97,4 @@ const AppointmentRow = ({ name, gender, date, time, status }) => (
   </tr>
 );
 
-export default DoctorDashboard;
+export default InformationMain;
