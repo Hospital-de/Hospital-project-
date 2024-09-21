@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { Star, Phone, Calendar, Mail, MapPin } from 'lucide-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Footer from "./components/Footer";
+import Header from "./components/Header";
 
 const DoctorCard = ({ doctor, onClick }) => (
   <motion.div
@@ -19,7 +21,9 @@ const DoctorCard = ({ doctor, onClick }) => (
         <p className="text-sm text-gray-500">{doctor.hospital_name || 'Hospital not specified'}</p>
         <div className="flex items-center mt-1">
           <Star className="w-4 h-4 text-yellow-400 fill-current" />
-          <span className="ml-1 text-sm text-gray-600">4.5</span>
+          <span className="ml-1 text-sm text-gray-600">
+            {doctor.averageRating ? doctor.averageRating.toFixed(1) : 'No ratings'}
+          </span>
         </div>
       </div>
     </div>
@@ -48,18 +52,32 @@ const DoctorsList = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchDoctors = async () => {
+    const fetchDoctorsAndReviews = async () => {
       try {
-        const response = await axios.get('http://localhost:4025/api/doctors');
-        setDoctors(response.data);
+        const doctorsResponse = await axios.get('http://localhost:4025/api/doctors');
+        const doctorsData = doctorsResponse.data;
+
+        // Fetch reviews for each doctor
+        const doctorsWithReviews = await Promise.all(
+          doctorsData.map(async (doctor) => {
+            const reviewsResponse = await axios.get(`http://localhost:4025/api/doctors/${doctor.id}/reviews`);
+            const reviews = reviewsResponse.data;
+            const averageRating = reviews.length > 0
+              ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
+              : null;
+            return { ...doctor, averageRating };
+          })
+        );
+
+        setDoctors(doctorsWithReviews);
         setLoading(false);
       } catch (err) {
-        setError('Failed to fetch doctors');
+        setError('Failed to fetch doctors and reviews');
         setLoading(false);
       }
     };
 
-    fetchDoctors();
+    fetchDoctorsAndReviews();
   }, []);
 
   const tabs = ['All', ...new Set(doctors.map(doctor => doctor.hospital_name).filter(Boolean))];
@@ -73,6 +91,7 @@ const DoctorsList = () => {
 
   return (
     <div className="bg-gray-100 min-h-screen p-8 font-sans">
+      <Header />
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800">Our Doctors</h1>
@@ -104,6 +123,7 @@ const DoctorsList = () => {
             ))}
         </motion.div>
       </div>
+      <Footer/>
     </div>
   );
 };

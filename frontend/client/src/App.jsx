@@ -9,11 +9,11 @@ import DoctorsList from './ourdoctors';
 
 
 import DoctorDashboardMain from './pages/doctordashboard/DoctorDashboardMain';
-import DoctorDashboardMain from './pages/doctordashboard/DoctorDashboardMain';
+
 
 import Header from './components/Header';
 import Footer from './components/Footer';
-import UserProfile from './pages/UserProfile';
+
 import UserProfile from './pages/UserProfile';
 
 
@@ -43,14 +43,7 @@ function App() {
           <Route path="/profile" element={<UserProfile />} />
           <Route path="/doctor/:id" element={<CombinedDentalAppointment />} />
           <Route path="/ourdoctors" element={<DoctorsList />} />
-          <Route
-            path="/"
-            element={
-              <PrivateRoute>
-                <Home />
-              </PrivateRoute>
-            }
-          />
+          <Route path="/" element={ <Home /> } />
           <Route
             path="/doctor-dashboard"
             element={
