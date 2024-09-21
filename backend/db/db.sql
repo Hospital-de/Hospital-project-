@@ -17,10 +17,13 @@ CREATE TABLE DoctorDetails (
     hospital_name TEXT,
     phone_number VARCHAR(20) NOT NULL,
     address TEXT,
+    image TEXT,
     email VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
 
 -- Doctor Availability Table
 CREATE TABLE DoctorAvailability (
@@ -34,18 +37,33 @@ CREATE TABLE DoctorAvailability (
     UNIQUE (doctor_id, date, time_slot)
 );
 
--- Appointments Table
+
+
 CREATE TABLE Appointments (
     id SERIAL PRIMARY KEY,
     patient_id INT REFERENCES Users(id) ON DELETE CASCADE,
     doctor_id INT REFERENCES Users(id) ON DELETE CASCADE,
-    date DATE NOT NULL,
-    time_slot VARCHAR(50) NOT NULL,
-    status VARCHAR(50) DEFAULT 'pending',
+    availability_id INT REFERENCES DoctorAvailability(id) ON DELETE CASCADE, 
+    status BOOLEAN DEFAULT FALSE,
     notes TEXT,
     is_deleted BOOLEAN DEFAULT FALSE,
-    UNIQUE (patient_id, doctor_id, date, time_slot)
+    UNIQUE (patient_id, doctor_id, availability_id)
 );
+
+
+
+-- -- Appointments Table
+-- CREATE TABLE Appointments (
+--     id SERIAL PRIMARY KEY,
+--     patient_id INT REFERENCES Users(id) ON DELETE CASCADE,
+--     doctor_id INT REFERENCES Users(id) ON DELETE CASCADE,
+--     date DATE NOT NULL,
+--     time_slot VARCHAR(50) NOT NULL,
+--     status VARCHAR(50) DEFAULT 'pending',
+--     notes TEXT,
+--     is_deleted BOOLEAN DEFAULT FALSE,
+--     UNIQUE (patient_id, doctor_id, date, time_slot)
+-- );
 
 -- Patient Medical Records
 CREATE TABLE PatientMedicalRecords (
