@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const pool = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
+const doctorroutes=require('./routes/doctorsroutes');
 const doctorAvailabilityRoutes = require('./routes/doctorAvailabilityRoutes')
 require('dotenv').config();
 
@@ -12,6 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
+app.use('/api/doctors', doctorroutes);
 
 //tasneem routes
 app.use('/api', doctorAvailabilityRoutes);
