@@ -31,6 +31,14 @@ const WelcomingAppointment = () => {
     }
   };
 
+  const storedUser = sessionStorage.getItem('user');
+  const userObject = JSON.parse(storedUser);
+  const doctorId = userObject.id;
+  const DoctorName = userObject.name;
+
+
+
+
   return (
     <motion.div 
       className="p-8 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl shadow-lg"
@@ -41,7 +49,7 @@ const WelcomingAppointment = () => {
       <div className="max-w-5xl mx-auto">
         <motion.header className="flex flex-col md:flex-row justify-between items-center mb-8" variants={itemVariants}>
           <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Hello, Ashley!</h1>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">Hello, {DoctorName}!</h1>
             <p className="text-sm text-gray-600">{currentDate}</p>
           </div>
           <div className="flex items-center mt-4 md:mt-0">
