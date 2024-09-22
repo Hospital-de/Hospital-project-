@@ -37,18 +37,14 @@ exports.getUserAppointments = async (req, res) => {
   }
 };
 
-
-
-exports.createAppointment = async (req, res) => {
-  
-};
+exports.createAppointment = async (req, res) => {};
 
 // appointmentController.js
 
 exports.cancelAppointment = async (req, res) => {
   const client = await pool.connect();
   try {
-    await client.query('BEGIN');
+    await client.query("BEGIN");
 
     const { appointmentId } = req.params;
     console.log("Appointment ID to cancel:", appointmentId);
@@ -83,7 +79,7 @@ exports.cancelAppointment = async (req, res) => {
       [availabilityId]
     );
 
-    await client.query('COMMIT');
+    await client.query("COMMIT");
 
     if (result.rows.length === 0) {
       throw new Error("Appointment not found");
@@ -91,14 +87,13 @@ exports.cancelAppointment = async (req, res) => {
 
     res.status(200).json({ message: "Appointment canceled successfully" });
   } catch (error) {
-    await client.query('ROLLBACK');
+    await client.query("ROLLBACK");
     console.error("Error canceling appointment:", error);
     res.status(500).json({ error: error.message || "Internal server error" });
   } finally {
     client.release();
   }
 };
-
 
 // appointmentController.js
 
@@ -133,7 +128,7 @@ exports.getAvailableTimes = async (req, res) => {
 exports.rescheduleAppointment = async (req, res) => {
   const client = await pool.connect();
   try {
-    await client.query('BEGIN');
+    await client.query("BEGIN");
 
     const { appointmentId } = req.params;
     const { newAvailabilityId } = req.body;
@@ -181,10 +176,10 @@ exports.rescheduleAppointment = async (req, res) => {
       [parseInt(newAvailabilityId)]
     );
 
-    await client.query('COMMIT');
+    await client.query("COMMIT");
     res.status(200).json({ message: "Appointment rescheduled successfully" });
   } catch (error) {
-    await client.query('ROLLBACK');
+    await client.query("ROLLBACK");
     console.error("Error rescheduling appointment:", error);
     res.status(500).json({ error: error.message || "Internal server error" });
   } finally {

@@ -260,7 +260,8 @@ const UserProfile = () => {
     console.log("Selected time:", selectedTime);
     console.log("Current appointment:", currentAppointment);
 
-    const appointmentId = currentAppointment.id || currentAppointment.appointment_id;
+    const appointmentId =
+      currentAppointment.id || currentAppointment.appointment_id;
     console.log("Appointment ID to be rescheduled:", appointmentId);
 
     if (!appointmentId) {
@@ -279,7 +280,7 @@ const UserProfile = () => {
           },
         }
       );
-      
+
       console.log("Reschedule response:", response.data);
 
       // Refresh appointments
@@ -292,7 +293,7 @@ const UserProfile = () => {
         }
       );
       setAppointments(updatedAppointments.data);
-      
+
       setRescheduleModalOpen(false);
       setSelectedTime(null);
       setCurrentAppointment(null);
@@ -429,19 +430,32 @@ const UserProfile = () => {
                 {appointments.map((appointment) => (
                   <li
                     key={appointment.id || appointment.appointment_id}
-                    className="bg-white shadow-md rounded-lg p-4 hover:shadow-lg transition duration-300">
+                    className="bg-white shadow-md rounded-lg p-4 hover:shadow-lg transition duration-300"
+                  >
                     <div className="flex justify-between items-center">
                       <div>
                         <p className="text-lg font-semibold">
-                          {appointment.user_role === "Patient" ? "Doctor" : "Patient"}: {appointment.other_party_name}
+                          {appointment.user_role === "Patient"
+                            ? "Doctor"
+                            : "Patient"}
+                          : {appointment.other_party_name}
                         </p>
                         <p className="text-sm text-gray-600">
-                          Date: {new Date(appointment.appointment_date).toLocaleDateString()}
+                          Date:{" "}
+                          {new Date(
+                            appointment.appointment_date
+                          ).toLocaleDateString()}
                         </p>
                         <p className="text-sm text-gray-600">
                           Time: {appointment.appointment_time}
                         </p>
-                        <p className={`text-sm ${appointment.status ? "text-green-600" : "text-yellow-600"}`}>
+                        <p
+                          className={`text-sm ${
+                            appointment.status
+                              ? "text-green-600"
+                              : "text-yellow-600"
+                          }`}
+                        >
                           Status: {appointment.status ? "Confirmed" : "Pending"}
                         </p>
                       </div>
@@ -467,15 +481,24 @@ const UserProfile = () => {
             {rescheduleModalOpen && (
               <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
                 <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-                  <h3 className="text-lg font-medium leading-6 text-gray-900 mb-2">Reschedule Appointment</h3>
+                  <h3 className="text-lg font-medium leading-6 text-gray-900 mb-2">
+                    Reschedule Appointment
+                  </h3>
                   <select
                     className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                    onChange={(e) => setSelectedTime(availableTimes.find(time => time.id === parseInt(e.target.value)))}
+                    onChange={(e) =>
+                      setSelectedTime(
+                        availableTimes.find(
+                          (time) => time.id === parseInt(e.target.value)
+                        )
+                      )
+                    }
                   >
                     <option value="">Select a new time</option>
                     {availableTimes.map((time) => (
                       <option key={time.id} value={time.id}>
-                        {new Date(time.date).toLocaleDateString()} - {time.time_slot}
+                        {new Date(time.date).toLocaleDateString()} -{" "}
+                        {time.time_slot}
                       </option>
                     ))}
                   </select>
