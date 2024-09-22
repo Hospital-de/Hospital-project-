@@ -38,7 +38,7 @@ const DashboardLayout = ({ children }) => {
               </li>
               <li>
                 <button
-                  onClick={() => navigate("/Appointments")}
+                  onClick={() => navigate("/appointments")}
                   className="block py-2 px-4 hover:bg-blue-700"
                 >
                   Appointments

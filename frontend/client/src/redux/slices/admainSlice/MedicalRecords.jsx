@@ -5,7 +5,7 @@ export const fetchMedicalRecords = createAsyncThunk(
   "medicalRecords/fetchMedicalRecords",
   async (patientId) => {
     const response = await axios.get(
-      `http://localhost:4025/api/admain/medical-records/${patientId}`
+      `http://localhost:4025/api/admain/medical-records`
     );
     return response.data;
   }

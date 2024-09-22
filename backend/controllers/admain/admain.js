@@ -115,26 +115,27 @@ const deletePatient = async (req, res) => {
 
 const findAppointments = async (req, res) => {
   const query = `
-    SELECT 
-      a.id, 
-      a.date, 
-      a.time_slot, 
-      a.status, 
+    SELECT
+      a.id,
+      da.date,
+      da.time_slot,
+      CASE WHEN a.status THEN 'confirmed' ELSE 'pending' END AS status,
       a.notes,
-      p.name AS patient_name, 
+      p.name AS patient_name,
       d.name AS doctor_name
-    FROM 
+    FROM
       Appointments a
-    JOIN 
+    JOIN
       Users p ON a.patient_id = p.id
-    JOIN 
+    JOIN
       Users d ON a.doctor_id = d.id
-    WHERE 
+    JOIN
+      DoctorAvailability da ON a.availability_id = da.id
+    WHERE
       a.is_deleted = false
-    ORDER BY 
-      a.date DESC, a.time_slot ASC
+    ORDER BY
+      da.date DESC, da.time_slot ASC
   `;
-
   try {
     const result = await pool.query(query);
     res.json(result.rows);
@@ -144,56 +145,7 @@ const findAppointments = async (req, res) => {
   }
 };
 
-const deleteAppointment = async (req, res) => {
-  const { id } = req.params;
-  const query = `
-    UPDATE Appointments 
-    SET is_deleted = true 
-    WHERE id = $1 AND is_deleted = false
-    RETURNING *
-  `;
-  const values = [id];
-
-  try {
-    const result = await pool.query(query, values);
-    if (result.rows.length === 0) {
-      return res
-        .status(404)
-        .json({ error: "Appointment not found or already deleted" });
-    }
-    res.json({ message: "Appointment deleted successfully" });
-  } catch (error) {
-    console.error("Error deleting appointment:", error);
-    res.status(500).json({ error: "Error deleting appointment" });
-  }
-};
-
-const updateAppointment = async (req, res) => {
-  const { id } = req.params;
-  const { status, notes } = req.body;
-  const query = `
-    UPDATE Appointments 
-    SET status = $1, notes = $2
-    WHERE id = $3 AND is_deleted = false
-    RETURNING *
-  `;
-  const values = [status, notes, id];
-
-  try {
-    const result = await pool.query(query, values);
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Appointment not found" });
-    }
-    res.json(result.rows[0]);
-  } catch (error) {
-    console.error("Error updating appointment:", error);
-    res.status(500).json({ error: "Error updating appointment" });
-  }
-};
-
-const findPatientMedicalRecords = async (req, res) => {
-  const { patientId } = req.params;
-  console.log("patientId" , patientId)
+const findAllMedicalRecords = async (req, res) => {
   const query = `
     SELECT 
       pmr.*,
@@ -206,30 +158,45 @@ const findPatientMedicalRecords = async (req, res) => {
     JOIN 
       DoctorDetails dd ON pmr.doctor_details = dd.id
     WHERE 
-      pmr.patient_id = $1 AND pmr.is_deleted = false
+      pmr.is_deleted = false
     ORDER BY 
       pmr.visit_date DESC
   `;
 
   try {
-    const result = await pool.query(query, [patientId]);
+    const result = await pool.query(query);
     res.json(result.rows);
   } catch (error) {
-    console.error("Error finding patient medical records:", error);
-    res.status(500).json({ error: "Error finding patient medical records" });
+    console.error("Error finding medical records:", error);
+    res.status(500).json({ error: "Error finding medical records" });
   }
 };
 
 const updateMedicalRecord = async (req, res) => {
   const { id } = req.params;
-  const { diagnosis, treatment_plan, medications, follow_up_date, visit_notes, is_paid } = req.body;
+  const {
+    diagnosis,
+    treatment_plan,
+    medications,
+    follow_up_date,
+    visit_notes,
+    is_paid,
+  } = req.body;
   const query = `
     UPDATE PatientMedicalRecords 
     SET diagnosis = $1, treatment_plan = $2, medications = $3, follow_up_date = $4, visit_notes = $5, is_paid = $6, updated_at = CURRENT_TIMESTAMP
     WHERE id = $7 AND is_deleted = false
     RETURNING *
   `;
-  const values = [diagnosis, treatment_plan, medications, follow_up_date, visit_notes, is_paid, id];
+  const values = [
+    diagnosis,
+    treatment_plan,
+    medications,
+    follow_up_date,
+    visit_notes,
+    is_paid,
+    id,
+  ];
 
   try {
     const result = await pool.query(query, values);
@@ -255,7 +222,9 @@ const deleteMedicalRecord = async (req, res) => {
   try {
     const result = await pool.query(query, [id]);
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Medical record not found or already deleted" });
+      return res
+        .status(404)
+        .json({ error: "Medical record not found or already deleted" });
     }
     res.json({ message: "Medical record deleted successfully" });
   } catch (error) {
@@ -263,7 +232,6 @@ const deleteMedicalRecord = async (req, res) => {
     res.status(500).json({ error: "Error deleting medical record" });
   }
 };
-
 
 module.exports = {
   findPatients,
@@ -273,9 +241,7 @@ module.exports = {
   editDoctor,
   deleteDoctor,
   findAppointments,
-  deleteAppointment,
-  updateAppointment,
-  findPatientMedicalRecords,
+  findAllMedicalRecords,
   updateMedicalRecord,
   deleteMedicalRecord,
 };

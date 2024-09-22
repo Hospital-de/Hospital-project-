@@ -7,6 +7,7 @@ export const fetchAppointments = createAsyncThunk(
     const response = await axios.get(
       "http://localhost:4025/api/admain/appointments"
     );
+    console.log("API response:", response.data);
     return response.data;
   }
 );
@@ -46,6 +47,7 @@ const appointmentsSlice = createSlice({
       .addCase(fetchAppointments.fulfilled, (state, action) => {
         state.loading = false;
         state.appointments = action.payload;
+        state.error = null;
       })
       .addCase(fetchAppointments.rejected, (state, action) => {
         state.loading = false;

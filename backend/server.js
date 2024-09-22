@@ -42,6 +42,9 @@ app.use(cors({
 app.use(express.json());
 app.use('/api/auth', authRoutes);
 
+app.use('/api/doctors', doctorroutes);
+
+
 app.use('/api/doctors', doctorRoutes);
 app.use('/api/DoctorPostsRoutes', DoctorPostsRoutes);
 // app.use('/api/doctors', doctorroutes);
