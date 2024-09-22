@@ -27,7 +27,6 @@ const Header = () => {
     { to: '/', label: 'Home' },
     { to: '/profile', label: 'Profile' },
     { to: '/DoctorPostsPage', label: 'Doctor Posts' },
-    { to: '/DoctorsPage', label: 'Doctors' },
     { to: '/about', label: 'About Us' },
     { to: '/contact', label: 'Contact' },
   ];

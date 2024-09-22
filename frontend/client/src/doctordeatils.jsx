@@ -5,6 +5,7 @@ import axios from 'axios';
 import io from 'socket.io-client';
 import Footer from "./components/Footer";
 import Header from "./components/Header";
+import Appointmentforusertestfile from '../src/Appointmentforusertestfile'
 
 const CombinedDentalAppointment = () => {
   const { id } = useParams();
@@ -12,8 +13,6 @@ const CombinedDentalAppointment = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('Book Appointment');
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [availableTimes, setAvailableTimes] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [showChat, setShowChat] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -110,16 +109,6 @@ const CombinedDentalAppointment = () => {
     { name: 'Reviews', icon: Star },
   ];
 
-  const workingHours = [
-    { day: 'Mon-Fri', hours: '9:00 AM - 5:00 PM' },
-    { day: 'Sat-Sun', hours: 'Closed' },
-  ];
-
-  const timeSlots = [
-    '9:00 am', '9:30 am', '10:00 am', '10:30 am', '11:00 am', '11:30 am',
-    '1:00 pm', '1:30 pm', '2:00 pm', '2:30 pm', '3:00 pm', '3:30 pm'
-  ];
-
   const services = [
     { name: 'Dental Checkup', price: '$50', icon: '🦷' },
     { name: 'Teeth Cleaning', price: '$80', icon: '🧼' },
@@ -128,66 +117,6 @@ const CombinedDentalAppointment = () => {
     { name: 'Tooth Extraction', price: '$150', icon: '🔨' },
     { name: 'Dental Crown', price: '$800', icon: '👑' },
   ];
-
-  const addAvailableTime = (time) => {
-    if (!availableTimes.includes(time)) {
-      setAvailableTimes([...availableTimes, time]);
-    }
-  };
-
-  const renderCalendar = () => {
-    const daysInMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0).getDate();
-    const firstDayOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1).getDay();
-    
-    const calendarDays = [];
-    for (let i = 0; i < firstDayOfMonth; i++) {
-      calendarDays.push(<div key={`empty-${i}`} className="text-center py-2"></div>);
-    }
-    
-    for (let day = 1; day <= daysInMonth; day++) {
-      const date = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), day);
-      const isToday = date.toDateString() === new Date().toDateString();
-      const isSelected = date.toDateString() === selectedDate.toDateString();
-      
-      calendarDays.push(
-        <button
-          key={day}
-          className={`text-center py-2 rounded-full w-8 h-8 mx-auto transition-all
-            ${isToday ? 'bg-blue-100 text-blue-600' : ''}
-            ${isSelected ? 'bg-blue-500 text-white' : ''}
-            ${!isToday && !isSelected ? 'hover:bg-blue-100 hover:text-blue-600' : ''}
-          `}
-          onClick={() => setSelectedDate(date)}
-        >
-          {day}
-        </button>
-      );
-    }
-    
-    return (
-      <div className="bg-white p-4 rounded-lg shadow-md">
-        <div className="flex justify-between items-center mb-4">
-          <button onClick={() => setSelectedDate(new Date(selectedDate.getFullYear(), selectedDate.getMonth() - 1, 1))}
-                  className="text-blue-500 hover:text-blue-700 transition-colors">
-            &lt; Prev
-          </button>
-          <h3 className="text-lg font-semibold">
-            {selectedDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
-          </h3>
-          <button onClick={() => setSelectedDate(new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 1))}
-                  className="text-blue-500 hover:text-blue-700 transition-colors">
-            Next &gt;
-          </button>
-        </div>
-        <div className="grid grid-cols-7 gap-2">
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-            <div key={day} className="text-center font-semibold text-gray-600">{day}</div>
-          ))}
-          {calendarDays}
-        </div>
-      </div>
-    );
-  };
 
   if (loading) return <div className="text-center mt-8">Loading...</div>;
   if (error) return <div className="text-center mt-8 text-red-500">{error}</div>;
@@ -293,53 +222,13 @@ const CombinedDentalAppointment = () => {
           )}
 
           {activeTab === 'Book Appointment' && (
-            <>
-              {/* Appointment Booking Section */}
-              <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-                <h2 className="font-semibold text-2xl flex items-center text-blue-700 mb-4">
-                  <Smile className="mr-2 text-blue-500" size={24} />
-                  Book an Appointment with {doctor.name}
-                </h2>
-                <div className="flex flex-wrap items-center justify-between text-sm text-gray-600">
-                  <p className="flex items-center mb-2 mr-4">
-                    <Clock className="mr-2 text-blue-500" size={18} />
-                    Working Hours:
-                  </p>
-                  {workingHours.map((schedule, index) => (
-                    <span key={index} className="mb-2">
-                      {schedule.day}: {schedule.hours}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-6">
-              <div className="w-full md:w-1/2">
-                  {renderCalendar()}
-                </div>
-                <div className="w-full md:w-1/2">
-                  <div className="bg-white p-4 rounded-lg shadow-md">
-                    <h3 className="font-semibold text-xl mb-4 flex items-center text-gray-800">
-                      <Clock className="mr-2 text-blue-500" size={24} />
-                      Available Times
-                    </h3>
-                    <div className="grid grid-cols-3 gap-3">
-                      {timeSlots.map((time) => (
-                        <button
-                          key={time}
-                          className={`text-center p-3 bg-gray-50 hover:bg-blue-100 rounded-lg transition-colors text-gray-700 hover:text-blue-800 font-semibold ${
-                            availableTimes.includes(time) ? 'bg-blue-500 text-white' : ''
-                          }`}
-                          onClick={() => addAvailableTime(time)}
-                        >
-                          {time}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </>
+            <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+              <h2 className="font-semibold text-2xl flex items-center text-blue-700 mb-4">
+                <Smile className="mr-2 text-blue-500" size={24} />
+                Book an Appointment with {doctor.name}
+              </h2>
+              <Appointmentforusertestfile doctorId={doctor.id} />
+            </div>
           )}
 
           {activeTab === 'Services' && (
