@@ -33,7 +33,7 @@ const MedicalRecords = () => {
         }
 
         const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/medical-records`,
+          `http://localhost:4025/api/medical-records`,
           {
             headers: {
               Authorization: `Bearer ${user.token}`,
@@ -167,14 +167,25 @@ const UserProfile = () => {
 
   const [activeTab, setActiveTab] = useState("profile");
 
+  const [availableTimes, setAvailableTimes] = useState([]);
+  const [selectedTime, setSelectedTime] = useState(null);
+  const [rescheduleModalOpen, setRescheduleModalOpen] = useState(false);
+  const [currentAppointment, setCurrentAppointment] = useState(null);
+
   useEffect(() => {
     if (user) {
       const fetchAppointments = async () => {
         try {
           setAppointmentsLoading(true);
           const response = await axios.get(
-            `http://localhost:4025/api/appointments/user/${user.id}`
+            `http://localhost:4025/api/appointments/user/${user.id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${user.token}`,
+              },
+            }
           );
+          console.log("Fetched appointments:", response.data);
           setAppointments(response.data);
         } catch (err) {
           setAppointmentsError("Failed to fetch appointments");
@@ -206,36 +217,130 @@ const UserProfile = () => {
     }
   };
 
-  const handleReschedule = async (appointmentId) => {
+  const handleReschedule = async (appointment) => {
+    console.log("Appointment to reschedule:", appointment);
+    setCurrentAppointment(appointment);
     try {
-      setAppointmentsLoading(true);
-      await axios.post(
-        `http://localhost:4025/api/appointments/reschedule/${appointmentId}`
+      const doctorId = appointment.doctor_id;
+      console.log("Doctor ID:", doctorId);
+
+      if (!doctorId) {
+        throw new Error("Doctor ID is undefined");
+      }
+
+      const response = await axios.get(
+        `http://localhost:4025/api/appointments/available-times/${doctorId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
       );
-      const updatedAppointments = await axios.get(
-        `http://localhost:4025/api/appointments/user/${user.id}`
-      );
-      setAppointments(updatedAppointments.data);
-      alert("Appointment rescheduled successfully!");
+      console.log("Available times response:", response.data);
+      setAvailableTimes(response.data);
+      setRescheduleModalOpen(true);
     } catch (err) {
-      alert(`Error rescheduling appointment: ${err.message}`);
-    } finally {
-      setAppointmentsLoading(false);
+      console.error("Error in handleReschedule:", err);
+      alert(`Error fetching available times: ${err.message}`);
     }
   };
 
-  const handleCancelAppointment = async (appointmentId) => {
+  const handleConfirmReschedule = async () => {
+    if (!selectedTime) {
+      alert("Please select a new time");
+      return;
+    }
+
+    if (!currentAppointment) {
+      console.error("No current appointment selected");
+      alert("Error: No appointment selected for rescheduling");
+      return;
+    }
+
+    console.log("Selected time:", selectedTime);
+    console.log("Current appointment:", currentAppointment);
+
+    const appointmentId =
+      currentAppointment.id || currentAppointment.appointment_id;
+    console.log("Appointment ID to be rescheduled:", appointmentId);
+
+    if (!appointmentId) {
+      console.error("Appointment ID is undefined");
+      alert("Error: Could not identify the appointment to reschedule");
+      return;
+    }
+
+    try {
+      const response = await axios.put(
+        `http://localhost:4025/api/appointments/${appointmentId}/reschedule`,
+        { newAvailabilityId: selectedTime.id },
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+
+      console.log("Reschedule response:", response.data);
+
+      // Refresh appointments
+      const updatedAppointments = await axios.get(
+        `http://localhost:4025/api/appointments/user/${user.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+      setAppointments(updatedAppointments.data);
+
+      setRescheduleModalOpen(false);
+      setSelectedTime(null);
+      setCurrentAppointment(null);
+      alert("Appointment rescheduled successfully!");
+    } catch (err) {
+      console.error("Error in handleConfirmReschedule:", err);
+      alert(`Error rescheduling appointment: ${err.message}`);
+    }
+  };
+
+  const handleCancelAppointment = async (appointment) => {
+    console.log("Appointment to cancel:", appointment);
+
+    if (!appointment || !appointment.id) {
+      console.error("Invalid appointment object");
+      alert("Error: Could not identify the appointment to cancel");
+      return;
+    }
+
+    const appointmentId = appointment.id;
+    console.log("Appointment ID to be canceled:", appointmentId);
+
     try {
       setAppointmentsLoading(true);
-      await axios.delete(
-        `http://localhost:4025/api/appointments/${appointmentId}`
+      const response = await axios.put(
+        `http://localhost:4025/api/appointments/${appointmentId}/cancel`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
       );
+      console.log("Cancel response:", response.data);
+
       const updatedAppointments = await axios.get(
-        `http://localhost:4025/api/appointments/user/${user.id}`
+        `http://localhost:4025/api/appointments/user/${user.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
       );
       setAppointments(updatedAppointments.data);
       alert("Appointment canceled successfully!");
     } catch (err) {
+      console.error("Error in handleCancelAppointment:", err);
       alert(`Error canceling appointment: ${err.message}`);
     } finally {
       setAppointmentsLoading(false);
@@ -309,26 +414,22 @@ const UserProfile = () => {
           </form>
         );
       case "appointments":
-        if (appointmentsLoading) {
-          return (
-            <div className="flex justify-center items-center h-64">
-              <FaSpinner className="animate-spin text-blue-500 text-4xl" />
-            </div>
-          );
-        }
-        if (appointmentsError) {
-          return <div className="text-red-600">{appointmentsError}</div>;
-        }
         return (
           <div>
             <h3 className="text-xl font-semibold mb-4">Your Appointments</h3>
-            {appointments.length === 0 ? (
+            {appointmentsLoading ? (
+              <div className="flex justify-center items-center h-64">
+                <FaSpinner className="animate-spin text-blue-500 text-4xl" />
+              </div>
+            ) : appointmentsError ? (
+              <div className="text-red-600">{appointmentsError}</div>
+            ) : appointments.length === 0 ? (
               <p>No appointments found.</p>
             ) : (
               <ul className="space-y-4">
                 {appointments.map((appointment) => (
                   <li
-                    key={appointment.appointment_id}
+                    key={appointment.id || appointment.appointment_id}
                     className="bg-white shadow-md rounded-lg p-4 hover:shadow-lg transition duration-300"
                   >
                     <div className="flex justify-between items-center">
@@ -350,31 +451,24 @@ const UserProfile = () => {
                         </p>
                         <p
                           className={`text-sm ${
-                            appointment.appointment_status
+                            appointment.status
                               ? "text-green-600"
                               : "text-yellow-600"
                           }`}
                         >
-                          Status:{" "}
-                          {appointment.appointment_status
-                            ? "Confirmed"
-                            : "Pending"}
+                          Status: {appointment.status ? "Confirmed" : "Pending"}
                         </p>
                       </div>
                       <div className="space-x-2">
                         <button
                           className="text-blue-500 hover:text-blue-700 transition duration-300"
-                          onClick={() =>
-                            handleReschedule(appointment.appointment_id)
-                          }
+                          onClick={() => handleReschedule(appointment)}
                         >
                           <FaEdit className="inline mr-1" /> Reschedule
                         </button>
                         <button
                           className="text-red-500 hover:text-red-700 transition duration-300"
-                          onClick={() =>
-                            handleCancelAppointment(appointment.appointment_id)
-                          }
+                          onClick={() => handleCancelAppointment(appointment)}
                         >
                           <FaTrash className="inline mr-1" /> Cancel
                         </button>
@@ -383,6 +477,47 @@ const UserProfile = () => {
                   </li>
                 ))}
               </ul>
+            )}
+            {rescheduleModalOpen && (
+              <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+                <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                  <h3 className="text-lg font-medium leading-6 text-gray-900 mb-2">
+                    Reschedule Appointment
+                  </h3>
+                  <select
+                    className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                    onChange={(e) =>
+                      setSelectedTime(
+                        availableTimes.find(
+                          (time) => time.id === parseInt(e.target.value)
+                        )
+                      )
+                    }
+                  >
+                    <option value="">Select a new time</option>
+                    {availableTimes.map((time) => (
+                      <option key={time.id} value={time.id}>
+                        {new Date(time.date).toLocaleDateString()} -{" "}
+                        {time.time_slot}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="mt-4">
+                    <button
+                      className="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                      onClick={handleConfirmReschedule}
+                    >
+                      Confirm Reschedule
+                    </button>
+                    <button
+                      className="ml-2 px-4 py-2 bg-gray-300 text-gray-800 text-base font-medium rounded-md shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                      onClick={() => setRescheduleModalOpen(false)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         );
@@ -459,7 +594,6 @@ const UserProfile = () => {
                 >
                   <FaChartBar className="mr-2" /> Health Report
                 </button>
-
                 <button
                   onClick={() => setActiveTab("medicalRecords")}
                   className={`flex items-center w-full text-left py-2 px-4 rounded mt-2 ${
