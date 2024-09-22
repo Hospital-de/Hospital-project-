@@ -452,7 +452,7 @@ const CombinedDentalAppointment = () => {
   const [activeTab, setActiveTab] = useState('Book Appointment');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [availableTimes, setAvailableTimes] = useState([]);
-  const [currentUserId, setCurrentUserId] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
   const [showChat, setShowChat] = useState(false);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
@@ -462,7 +462,7 @@ const CombinedDentalAppointment = () => {
   useEffect(() => {
     const userId = localStorage.getItem('user_id');
     if (userId) {
-      setCurrentUserId(userId);
+      fetchCurrentUser(userId);
     }
 
     const fetchDoctorDetails = async () => {
@@ -479,29 +479,7 @@ const CombinedDentalAppointment = () => {
     fetchDoctorDetails();
 
     // Initialize Socket.IO connection
-    socketRef.current = io('http://localhost:4025');
-
-    // Join the room
-    if (userId && id) {
-      socketRef.current.emit('joinRoom', { userId, doctorId: id });
-    }
-
-    // Fetch previous messages
-    const fetchMessages = async () => {
-      try {
-        const response = await axios.get(`http://localhost:4025/api/chat/${userId}/${id}`);
-        setMessages(response.data);
-      } catch (err) {
-        console.error('Failed to fetch messages:', err);
-      }
-    };
-
-    fetchMessages();
-
-    // Listen for incoming messages
-    socketRef.current.on('message', (message) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
-    });
+    socketRef.current = io('http://localhost:5173/');
 
     // Clean up on component unmount
     return () => {
@@ -510,20 +488,56 @@ const CombinedDentalAppointment = () => {
   }, [id]);
 
   useEffect(() => {
+    if (currentUser && doctor) {
+      // Join the room
+      socketRef.current.emit('joinRoom', { userId: currentUser.id, doctorId: doctor.user_id });
+
+      // Fetch previous messages
+      fetchMessages();
+
+      // Listen for incoming messages
+      socketRef.current.on('message', (message) => {
+        setMessages((prevMessages) => [...prevMessages, message]);
+      });
+    }
+  }, [currentUser, doctor]);
+
+  useEffect(() => {
     // Scroll to bottom of chat box when new messages arrive
     if (chatBoxRef.current) {
       chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
     }
   }, [messages]);
 
+  const fetchCurrentUser = async (userId) => {
+    try {
+      const response = await axios.get(`http://localhost:4025/api/users/${userId}`);
+      setCurrentUser(response.data);
+    } catch (err) {
+      console.error('Failed to fetch current user:', err);
+    }
+  };
+
+  const fetchMessages = async () => {
+    if (currentUser && doctor) {
+      try {
+        const response = await axios.get(`http://localhost:4025/api/chat/${currentUser.id}/${doctor.user_id}`);
+        setMessages(response.data);
+      } catch (err) {
+        console.error('Failed to fetch messages:', err);
+      }
+    }
+  };
+
   const sendMessage = (e) => {
     e.preventDefault();
-    if (newMessage.trim() && currentUserId) {
-      socketRef.current.emit('sendMessage', {
-        user_id: currentUserId,
-        doctor_id: id,
+    if (newMessage.trim() && currentUser && doctor) {
+      const messageData = {
+        sender_id: currentUser.id,
+        receiver_id: doctor.user_id,
         message: newMessage,
-      });
+      };
+      socketRef.current.emit('sendMessage', messageData);
       setNewMessage('');
     }
   };
@@ -691,8 +705,8 @@ const CombinedDentalAppointment = () => {
               </h2>
               <div ref={chatBoxRef} className="h-64 overflow-y-auto mb-4 p-4 border rounded">
                 {messages.map((msg, index) => (
-                  <div key={index} className={`mb-2 ${msg.user_id === currentUserId ? 'text-right' : 'text-left'}`}>
-                    <span className={`inline-block p-2 rounded ${msg.user_id === currentUserId ? 'bg-blue-100' : 'bg-gray-100'}`}>
+                  <div key={index} className={`mb-2 ${msg.sender_id === currentUser.id ? 'text-right' : 'text-left'}`}>
+                    <span className={`inline-block p-2 rounded ${msg.sender_id === currentUser.id ? 'bg-blue-100' : 'bg-gray-100'}`}>
                       {msg.message}
                     </span>
                   </div>
@@ -738,7 +752,7 @@ const CombinedDentalAppointment = () => {
               </div>
 
               <div className="flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-6">
-                <div className="w-full md:w-1/2">
+              <div className="w-full md:w-1/2">
                   {renderCalendar()}
                 </div>
                 <div className="w-full md:w-1/2">
@@ -783,7 +797,7 @@ const CombinedDentalAppointment = () => {
             </div>
           )}
 
-          {activeTab === 'Reviews' && <ReviewsSection doctorId={id} currentUserId={currentUserId} />}
+          {activeTab === 'Reviews' && <ReviewsSection doctorId={id} currentUserId={currentUser?.id} />}
         </div>
       </div>
       <Footer/>

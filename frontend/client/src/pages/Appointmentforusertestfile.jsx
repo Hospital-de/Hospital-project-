@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday } from 'date-fns';
+import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday, parseISO } from 'date-fns';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import axios from 'axios';
 
@@ -10,11 +10,13 @@ const Appointmentforusertestfile = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [patientId, setPatientId] = useState(1); // Replace with actual patient ID
 
+  // Fetch availabilities from the backend
   const fetchAvailabilities = useCallback(async () => {
     try {
       const response = await axios.get('http://localhost:4025/api/Allavailability');
       const availabilitiesArray = Array.isArray(response.data) ? response.data : [];
       setAvailabilities(availabilitiesArray);
+      console.log(availabilitiesArray); // Log all fetched availabilities
     } catch (error) {
       console.error('Error fetching availabilities:', error);
       setAvailabilities([]);
@@ -26,45 +28,73 @@ const Appointmentforusertestfile = () => {
   }, [fetchAvailabilities]);
 
   const formatDate = (date) => {
-    const utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-    return utcDate.toISOString().split('T')[0];
+    // Add one day to the date to correct the offset
+    const correctedDate = new Date(date);
+    correctedDate.setDate(correctedDate.getDate() + 1);
+    return correctedDate.toISOString().split('T')[0];
   };
 
+  // Fetch availabilities for the selected date
   const fetchAvailabilitiesForDate = (date) => {
     const formattedDate = formatDate(date);
+    console.log("Selected Date (from calendar):", formattedDate); // Print the selected date
     const filteredAvailabilities = availabilities.filter((availability) => {
-      const availabilityDate = availability.date.split('T')[0];
-      return availabilityDate === formattedDate;
+      const availabilityDate = new Date(availability.date);
+      availabilityDate.setDate(availabilityDate.getDate() + 1); // Add one day to correct the offset
+      const correctedAvailabilityDate = availabilityDate.toISOString().split('T')[0];
+      console.log("Availability Date (from API):", correctedAvailabilityDate); // Print each availability date
+      return correctedAvailabilityDate === formattedDate;
     });
     setAvailabilitiesForDate(filteredAvailabilities);
   };
 
+  // Handle date change from the calendar
   const handleDateChange = (date) => {
     setSelectedDate(date);
+    console.log("Selected Date (onClick):", format(date, 'yyyy-MM-dd')); // Print the date selected from the calendar
     fetchAvailabilitiesForDate(date);
   };
 
+  // Change the current month
   const changeMonth = (increment) => {
     setCurrentDate(prevDate => increment ? addMonths(prevDate, 1) : subMonths(prevDate, 1));
   };
 
+  // Get all days in the current month for the calendar
   const getDaysInMonth = () => {
     const start = startOfMonth(currentDate);
     const end = endOfMonth(currentDate);
     return eachDayOfInterval({ start, end });
   };
 
+  // Determine the CSS classes for each day in the calendar
   const getDayClass = (day) => {
     let classes = "w-8 h-8 rounded-full flex items-center justify-center";
     if (!isSameMonth(day, currentDate)) classes += " text-gray-300";
     if (isSameDay(day, selectedDate)) classes += " bg-blue-500 text-white";
     if (isToday(day)) classes += " border-2 border-blue-500";
-    if (availabilities.some(avail => isSameDay(new Date(avail.date), day) && avail.is_available && !avail.is_booked)) {
-      classes += " bg-green-300";
+    
+    const dayAvailabilities = availabilities.filter(avail => {
+      const availDate = new Date(avail.date);
+      availDate.setDate(availDate.getDate() + 1); // Add one day to correct the offset
+      return isSameDay(availDate, day);
+    });
+    
+    if (dayAvailabilities.length > 0) {
+      const hasAvailable = dayAvailabilities.some(avail => avail.is_available && !avail.is_booked);
+      const allBooked = dayAvailabilities.every(avail => avail.is_booked);
+      
+      if (allBooked) {
+        classes += " bg-red-300"; // All appointments are booked
+      } else if (hasAvailable) {
+        classes += " bg-yellow-300"; // There are available appointments
+      }
     }
+    
     return classes;
   };
 
+  // Book an appointment
   const bookAppointment = async (availability) => {
     try {
       const response = await axios.post('http://localhost:4025/api/appointments/book', {
@@ -85,18 +115,15 @@ const Appointmentforusertestfile = () => {
     } catch (error) {
       console.error('Error booking appointment:', error);
       if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
         alert(`Failed to book appointment: ${error.response.data.message}`);
       } else if (error.request) {
-        // The request was made but no response was received
         alert('No response received from server. Please try again later.');
       } else {
-        // Something happened in setting up the request that triggered an Error
         alert('An error occurred while booking the appointment. Please try again.');
       }
     }
   };
+
   return (
     <div className="bg-gray-100 min-h-screen p-8">
       <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-md overflow-hidden mt-8">
@@ -144,12 +171,14 @@ const Appointmentforusertestfile = () => {
                   availabilitiesForDate.map((availability) => (
                     <li key={availability.id} className={`border p-4 rounded-lg shadow-sm ${availability.is_booked ? 'bg-red-100' : 'bg-green-100'}`}>
                       <div>
-                        <h3 className="font-semibold text-lg text-gray-800">{availability.time_slot}</h3>
+                        <h3 className="font-semibold text-lg text-gray-800">
+                          {format(new Date(availability.date), 'MMMM d, yyyy')} at {availability.time_slot}
+                        </h3>
                         <p className="text-sm text-gray-600">Doctor: Dr. {availability.doctor_name}</p>
                         {!availability.is_booked && (
                           <button 
                             onClick={() => bookAppointment(availability)}
-                            className="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300"
+                            className="mt-2 bg-teal-900 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300"
                           >
                             Book Appointment
                           </button>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchAppointments } from '../../redux/slices/appointmentsSlice';
 import { Calendar, MessageSquare, Users, Activity, Plus, Bell, Sun, ChevronRight } from 'lucide-react';
@@ -44,6 +44,7 @@ const InformationMain = () => {
       className="rounded-xl min-h-screen mt-12"
     >
       <div className="rounded-xl shadow-lg bg-gradient-to-br from-gray-100 to-gray-200 p-10">
+   
         {/* Header */}
         <header className="flex justify-between items-center mb-8">
           <motion.div initial={{ x: -20 }} animate={{ x: 0 }} transition={{ duration: 0.5 }}>

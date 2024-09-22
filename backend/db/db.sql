@@ -134,3 +134,12 @@ CREATE TABLE Payments (
     payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     appointment_id INT REFERENCES Appointments(id)
 );
+
+
+CREATE TABLE messages (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES Users(id) ON DELETE CASCADE,
+    doctor_id INT REFERENCES DoctorDetails(id) ON DELETE CASCADE,
+    message TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
