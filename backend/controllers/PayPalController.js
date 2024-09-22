@@ -41,7 +41,6 @@ const PayPalController = {
     try {
       const capture = await client.execute(request);
       const paymentStatus = capture.result.status;
-
       if (paymentStatus !== 'COMPLETED') {
         return res.status(400).json({ error: 'Order not completed' });
       }
@@ -50,7 +49,7 @@ const PayPalController = {
         INSERT INTO Payments (user_id, amount, payment_status, appointment_id)
         VALUES ($1, $2, $3, $4) RETURNING *;
       `;
-      const values = [1, amount, paymentStatus, 1];
+      const values = [1, amount, "pending", 1];
 
       const result = await pool.query(query, values);
       

@@ -49,8 +49,9 @@ function App() {
     <Router>
       <div className="App">
       <PayPalScriptProvider options={{ "client-id": "AZZnJo9B4ulFid8Kdc6--QozivoXGg7263KyHe5KFomW-t-qQQ4cWR7l2lFScv10s0N_iq-DQpewLwDJ" }}>
-      <PayPalPayment amount="10.00" userId="123" appointmentId="456" />
+
         <Routes>
+        <Route path="/paypal" element={ <PayPalPayment amount="10.00" userId="123" appointmentId="456" />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/appointments" element={<AppointmentsDashboard />} />
           <Route path="/MedicalRecords" element={<PatientMedicalRecords />} />
@@ -90,3 +91,6 @@ function App() {
 }
 
 export default App;
+
+
+
