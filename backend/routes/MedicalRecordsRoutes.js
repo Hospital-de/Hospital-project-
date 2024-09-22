@@ -54,7 +54,7 @@ const medicalRecordsController = require("../controllers/medicalRecordsControlle
 const authMiddleware = require("../middlewares/auth");
 
 // Get user's medical records
-router.get("/", authMiddleware, medicalRecordsController.getUserMedicalRecords);
+// router.get("/" , medicalRecordsController.getUsersWithMedicalRecords);
 
 // Create a new medical record (only for doctors)
 router.post(

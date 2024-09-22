@@ -32,7 +32,7 @@ const PORT = process.env.PORT || 4025;
 app.use(cors());
 app.use(express.json());
 app.use('/api/auth', authRoutes);
-app.use('/api/doctors', doctorRoutes);
+app.use('/api/doctors', doctorroutes);
 app.use('/api/chat', chatRoutes);
 app.use("/api/admain", admain);
 app.use("/api/profile", profileRoutes);
