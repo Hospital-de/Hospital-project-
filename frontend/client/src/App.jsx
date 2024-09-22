@@ -1,8 +1,3 @@
-
-
-
-
-
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -68,18 +63,7 @@ function App() {
           <Route path="/doctor/:id" element={<CombinedDentalAppointment />} />
           <Route path="/ourdoctors" element={<DoctorsList />} />
           <Route path="/" element={ <Home /> } />
-          <Route
-            path="/DoctorDashboardMain"
-            element={
-              <PrivateRoute allowedRoles={["Doctor"]}>
-
-                <DoctorDashboardMain />
-
-              </PrivateRoute>
-            }
-          />
-
-
+          <Route path="/DoctorDashboardMain" element={ <DoctorDashboardMain /> } />
 <Route path="/Appointmentforusertestfile" element={<Appointmentforusertestfile/>} />
 
         </Routes>

@@ -1,75 +1,89 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday } from 'date-fns';
+import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday, parseISO } from 'date-fns';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import axios from 'axios';
 
 const Appointmentforusertestfile = () => {
   const [availabilities, setAvailabilities] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [availabilitiesForDate, setAvailabilitiesForDate] = useState([]);
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [patientId, setPatientId] = useState(1); // Replace with actual patient ID
+  const [doctorId, setDoctorId] = useState(1); // Replace with actual doctor ID
 
-  const fetchAvailabilities = useCallback(async () => {
+  // Fetch availabilities for the entire month
+  const fetchMonthAvailabilities = useCallback(async (date) => {
     try {
-      const response = await axios.get('http://localhost:4025/api/Allavailability');
+      const startDate = startOfMonth(date);
+      const endDate = endOfMonth(date);
+      const formattedStartDate = format(startDate, 'yyyy-MM-dd');
+      const formattedEndDate = format(endDate, 'yyyy-MM-dd');
+      
+      const response = await axios.get(`http://localhost:4025/api/availability/${doctorId}`, {
+        params: { startDate: formattedStartDate, endDate: formattedEndDate }
+      });
       const availabilitiesArray = Array.isArray(response.data) ? response.data : [];
       setAvailabilities(availabilitiesArray);
+      console.log(availabilitiesArray); // Log all fetched availabilities
     } catch (error) {
       console.error('Error fetching availabilities:', error);
       setAvailabilities([]);
     }
-  }, []);
+  }, [doctorId]);
 
   useEffect(() => {
-    fetchAvailabilities();
-  }, [fetchAvailabilities]);
+    fetchMonthAvailabilities(currentDate);
+  }, [fetchMonthAvailabilities, currentDate]);
 
-  const formatDate = (date) => {
-    const utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-    return utcDate.toISOString().split('T')[0];
-  };
-
-  const fetchAvailabilitiesForDate = (date) => {
-    const formattedDate = formatDate(date);
-    const filteredAvailabilities = availabilities.filter((availability) => {
-      const availabilityDate = availability.date.split('T')[0];
-      return availabilityDate === formattedDate;
-    });
-    setAvailabilitiesForDate(filteredAvailabilities);
-  };
-
+  // Handle date change from the calendar
   const handleDateChange = (date) => {
     setSelectedDate(date);
-    fetchAvailabilitiesForDate(date);
+    console.log("Selected Date (onClick):", format(date, 'yyyy-MM-dd'));
   };
 
+  // Change the current month
   const changeMonth = (increment) => {
-    setCurrentDate(prevDate => increment ? addMonths(prevDate, 1) : subMonths(prevDate, 1));
+    const newDate = increment ? addMonths(currentDate, 1) : subMonths(currentDate, 1);
+    setCurrentDate(newDate);
+    fetchMonthAvailabilities(newDate);
   };
 
+  // Get all days in the current month for the calendar
   const getDaysInMonth = () => {
     const start = startOfMonth(currentDate);
     const end = endOfMonth(currentDate);
     return eachDayOfInterval({ start, end });
   };
 
-  const getDayClass = (day) => {
+  // Determine the CSS classes for each day in the calendar
+  const getDayClass = useCallback((day) => {
     let classes = "w-8 h-8 rounded-full flex items-center justify-center";
     if (!isSameMonth(day, currentDate)) classes += " text-gray-300";
     if (isSameDay(day, selectedDate)) classes += " bg-blue-500 text-white";
     if (isToday(day)) classes += " border-2 border-blue-500";
-    if (availabilities.some(avail => isSameDay(new Date(avail.date), day) && avail.is_available && !avail.is_booked)) {
-      classes += " bg-green-300";
+    
+    const dayAvailabilities = availabilities.filter(avail => 
+      isSameDay(parseISO(avail.date), day)
+    );
+    
+    if (dayAvailabilities.length > 0) {
+      const hasAvailable = dayAvailabilities.some(avail => avail.is_available && !avail.is_booked);
+      const allBooked = dayAvailabilities.every(avail => avail.is_booked);
+      
+      if (allBooked) {
+        classes += " bg-red-300"; // All appointments are booked
+      } else if (hasAvailable) {
+        classes += " bg-yellow-300"; // There are available appointments
+      }
     }
+    
     return classes;
-  };
+  }, [availabilities, currentDate, selectedDate]);
 
+  // Book an appointment
   const bookAppointment = async (availability) => {
     try {
       const response = await axios.post('http://localhost:4025/api/appointments/book', {
         patient_id: 11,
-        doctor_id: availability.doctor_id,
+        doctor_id: doctorId,
         availability_id: availability.id,
         notes: "Booked via web interface"
       });
@@ -79,24 +93,27 @@ const Appointmentforusertestfile = () => {
           avail.id === availability.id ? { ...avail, is_booked: true } : avail
         );
         setAvailabilities(updatedAvailabilities);
-        fetchAvailabilitiesForDate(selectedDate);
         alert('Appointment booked successfully!');
       }
     } catch (error) {
       console.error('Error booking appointment:', error);
       if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
         alert(`Failed to book appointment: ${error.response.data.message}`);
       } else if (error.request) {
-        // The request was made but no response was received
         alert('No response received from server. Please try again later.');
       } else {
-        // Something happened in setting up the request that triggered an Error
         alert('An error occurred while booking the appointment. Please try again.');
       }
     }
   };
+
+  // Get availabilities for the selected date
+  const getAvailabilitiesForSelectedDate = useCallback(() => {
+    return availabilities.filter(avail => 
+      isSameDay(parseISO(avail.date), selectedDate)
+    );
+  }, [availabilities, selectedDate]);
+
   return (
     <div className="bg-gray-100 min-h-screen p-8">
       <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-md overflow-hidden mt-8">
@@ -140,16 +157,18 @@ const Appointmentforusertestfile = () => {
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h2 className="text-xl font-semibold mb-4 text-gray-700">Appointments for {format(selectedDate, 'MMMM d, yyyy')}</h2>
               <ul className="space-y-4">
-                {availabilitiesForDate.length > 0 ? (
-                  availabilitiesForDate.map((availability) => (
+                {getAvailabilitiesForSelectedDate().length > 0 ? (
+                  getAvailabilitiesForSelectedDate().map((availability) => (
                     <li key={availability.id} className={`border p-4 rounded-lg shadow-sm ${availability.is_booked ? 'bg-red-100' : 'bg-green-100'}`}>
                       <div>
-                        <h3 className="font-semibold text-lg text-gray-800">{availability.time_slot}</h3>
-                        <p className="text-sm text-gray-600">Doctor: Dr. {availability.doctor_name}</p>
+                        <h3 className="font-semibold text-lg text-gray-800">
+                          {format(parseISO(availability.date), 'MMMM d, yyyy')} at {availability.time_slot}
+                        </h3>
+                        <p className="text-sm text-gray-600">Doctor ID: {doctorId}</p>
                         {!availability.is_booked && (
                           <button 
                             onClick={() => bookAppointment(availability)}
-                            className="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300"
+                            className="mt-2 bg-teal-900 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300"
                           >
                             Book Appointment
                           </button>
