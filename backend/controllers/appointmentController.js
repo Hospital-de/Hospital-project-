@@ -5,6 +5,7 @@ const pool = require("../config/db");
 exports.getUserAppointments = async (req, res) => {
   try {
     const userId = req.params.userId;
+    console.log("userId", userId);
     const query = `
       SELECT 
         a.id AS appointment_id,

@@ -33,7 +33,7 @@ app.use(express.json());
 
 
 app.use('/api/auth', authRoutes);
-app.use('/api/doctors', doctorRoutes);
+app.use('/api/doctors', doctorroutes);
 
 app.use('/api/chat', chatRoutes);
 

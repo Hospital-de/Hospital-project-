@@ -1,28 +1,19 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  fetchAppointments,
-  deleteAppointment,
-  updateAppointment,
-} from "../redux/slices/admainSlice/appointments";
+import { fetchAppointments } from "../redux/slices/admainSlice/appointments";
 import DashboardLayout from "./admin";
-
 const AppointmentsDashboard = () => {
   const dispatch = useDispatch();
-  const appointments = useSelector((state) => state.appointments.appointments);
-  const loading = useSelector((state) => state.appointments.loading);
-  const error = useSelector((state) => state.appointments.error);
+  const appointmentsState = useSelector((state) => state.appointments);
+  const { appointmentsData, loading, error } = appointmentsState;
 
   useEffect(() => {
     dispatch(fetchAppointments());
   }, [dispatch]);
 
-  const handleDelete = (id) => {
-    dispatch(deleteAppointment(id));
-  };
-
-  const handleStatusChange = (id, newStatus) => {
-    dispatch(updateAppointment({ id, status: newStatus }));
+  const formatDate = (dateString) => {
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
   if (loading) return <div className="text-center py-4">Loading...</div>;
@@ -32,56 +23,81 @@ const AppointmentsDashboard = () => {
   return (
     <DashboardLayout>
       <div className="container mx-auto p-6">
-        <h2 className="text-2xl font-bold mb-4">Appointments Dashboard</h2>
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-300 shadow-md">
-            <thead>
-              <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                <th className="py-3 px-6 text-left">Patient</th>
-                <th className="py-3 px-6 text-left">Doctor</th>
-                <th className="py-3 px-6 text-left">Date</th>
-                <th className="py-3 px-6 text-left">Time Slot</th>
-                <th className="py-3 px-6 text-left">Status</th>
-                <th className="py-3 px-6 text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="text-gray-600 text-sm font-light">
-              {appointments.map((appointment) => (
-                <tr key={appointment.id} className="border-b hover:bg-gray-100">
-                  <td className="py-3 px-6">{appointment.patient_name}</td>
-                  <td className="py-3 px-6">{appointment.doctor_name}</td>
-                  <td className="py-3 px-6">{appointment.date}</td>
-                  <td className="py-3 px-6">{appointment.time_slot}</td>
-                  <td className="py-3 px-6">{appointment.status}</td>
-                  <td className="py-3 px-6 flex space-x-2">
-                    <button
-                      className="bg-green-500 text-white font-bold py-1 px-3 rounded hover:bg-green-600"
-                      onClick={() =>
-                        handleStatusChange(appointment.id, "confirmed")
-                      }
-                    >
-                      Confirm
-                    </button>
-                    <button
-                      className="bg-yellow-500 text-white font-bold py-1 px-3 rounded hover:bg-yellow-600"
-                      onClick={() =>
-                        handleStatusChange(appointment.id, "cancelled")
-                      }
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      className="bg-red-500 text-white font-bold py-1 px-3 rounded hover:bg-red-600"
-                      onClick={() => handleDelete(appointment.id)}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <h2 className="text-3xl font-bold mb-6 text-gray-800">
+          Appointments Dashboard
+        </h2>
+        <div className="mb-6 bg-white p-4 rounded-lg shadow">
+          <p className="text-lg font-semibold mb-4">
+            Total Appointments:{" "}
+            {appointmentsData ? appointmentsData.length : "N/A"}
+          </p>
+          <button
+            onClick={() => dispatch(fetchAppointments())}
+            className="bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-600 transition duration-300"
+          >
+            Refresh Appointments
+          </button>
         </div>
+        {appointmentsData && appointmentsData.length > 0 ? (
+          <div className="overflow-x-auto bg-white rounded-lg shadow">
+            <table className="min-w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Patient
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Doctor
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Date
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Time Slot
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {appointmentsData.map((appointment) => (
+                  <tr key={appointment.id}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {appointment.patient_name}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {appointment.doctor_name}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {formatDate(appointment.date)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {appointment.time_slot}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <span
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          appointment.status === "confirmed"
+                            ? "bg-green-100 text-green-800"
+                            : appointment.status === "cancelled"
+                            ? "bg-red-100 text-red-800"
+                            : "bg-yellow-100 text-yellow-800"
+                        }`}
+                      >
+                        {appointment.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="text-center py-4 bg-white rounded-lg shadow">
+            No appointments found.
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );

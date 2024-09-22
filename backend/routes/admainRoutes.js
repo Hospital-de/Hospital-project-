@@ -7,9 +7,8 @@ const {
   editDoctor,
   deleteDoctor,
   findAppointments,
-  deleteAppointment,
-  updateAppointment,
-  findPatientMedicalRecords,
+
+  findAllMedicalRecords,
   updateMedicalRecord,
   deleteMedicalRecord,
 } = require("../controllers/admain/admain");
@@ -25,11 +24,10 @@ router.delete("/doctors/:id", deleteDoctor);
 
 //appointments
 router.get("/appointments", findAppointments);
-router.delete("/appointments/:id", deleteAppointment);
-router.put("/appointments/:id", updateAppointment);
 
 //MedicalRecord
-router.get("/medical-records/:patientId", findPatientMedicalRecords);
+router.get("/medical-records", findAllMedicalRecords);
+
 router.put("/medical-records/:id", updateMedicalRecord);
 router.delete("/medical-records/:id", deleteMedicalRecord);
 
