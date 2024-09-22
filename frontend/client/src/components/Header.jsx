@@ -26,9 +26,8 @@ const Header = () => {
   const menuItems = [
     { to: '/', label: 'Home' },
     { to: '/profile', label: 'Profile' },
-    { to: '/appointments', label: 'Appointments' },
-    { to: '/billing', label: 'Billing' },
-    { to: '/services', label: 'Services' },
+    { to: '/DoctorPostsPage', label: 'Doctor Posts' },
+    { to: '/DoctorsPage', label: 'Doctors' },
     { to: '/about', label: 'About Us' },
     { to: '/contact', label: 'Contact' },
   ];

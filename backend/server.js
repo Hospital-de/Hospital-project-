@@ -20,7 +20,7 @@ const userRoutes = require("./routes/userroutes");
 const appointmentRoutes = require("./routes/appointmentRoutes");
 const medicalRecordsRoutes = require("./routes/MedicalRecordsRoutes");
 
-const doctorRoutes=require('./routes/doctorsroutes');
+
 
 const doctorAvailabilityRoutes = require('./routes/doctorAvailabilityRoutes')
 const doctorAppointmentRoute = require('./routes/doctorAppointment')
@@ -44,13 +44,13 @@ app.use('/api/auth', authRoutes);
 
 app.use('/api/doctors', doctorRoutes);
 app.use('/api/DoctorPostsRoutes', DoctorPostsRoutes);
-app.use('/api/doctors', doctorroutes);
+// app.use('/api/doctors', doctorroutes);
 app.use('/api/users', userRoutes);
 app.use('/api/chat', chatRoutes);
 app.use("/api/admain", admain);
 app.use("/api/profile", profileRoutes);
 app.use("/api/appointments", appointmentRoutes);
-app.use("/api/medical-records", medicalRecordsRoutes);
+// app.use("/api/medical-records", medicalRecordsRoutes);
 
 //tasneem routes
 app.use('/api', doctorAvailabilityRoutes);

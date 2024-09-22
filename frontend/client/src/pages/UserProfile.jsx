@@ -21,7 +21,7 @@ const MedicalRecords = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const user = useSelector((state) => state.auth.user);
-
+  
   useEffect(() => {
     const fetchMedicalRecords = async () => {
       try {
