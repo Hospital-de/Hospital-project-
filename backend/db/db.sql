@@ -136,6 +136,7 @@ CREATE TABLE Payments (
 );
 
 
+
 CREATE TABLE messages (
     id SERIAL PRIMARY KEY,
     user_id INT REFERENCES Users(id) ON DELETE CASCADE,
@@ -143,3 +144,16 @@ CREATE TABLE messages (
     message TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE ContactUs (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    subject VARCHAR(200) NOT NULL,
+    message TEXT NOT NULL,
+    status VARCHAR(20) DEFAULT 'Pending' CHECK (status IN ('Pending', 'In Progress', 'Resolved')),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    resolved_at TIMESTAMP
+);
+

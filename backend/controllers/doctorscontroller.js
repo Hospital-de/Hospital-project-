@@ -17,6 +17,29 @@ exports.getAllDoctors = async (req, res) => {
 };
 
 
+// In your doctorController.js or wherever you fetch doctor details
+exports.getDoctorById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(`
+      SELECT d.*, u.id as user_id
+      FROM DoctorDetails d
+      JOIN Users u ON d.doctor_id = u.id
+      WHERE d.id = $1
+    `, [id]);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Doctor not found' });
+    }
+    
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Error fetching doctor details:', error);
+    res.status(500).json({ error: 'An error occurred while fetching doctor details' });
+  }
+};
+
+
 exports.createReview = async (req, res) => {
     const { doctor_id, rating, review, user_id } = req.body;
   
