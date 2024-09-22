@@ -21,7 +21,7 @@ const PayPalPayment = ({ amount, userId, appointmentId }) => {
     try {
       const response = await axios.post(`http://localhost:4025/api/payments/capture-order`, {
         orderId: data.orderID,
-        userId,
+        userId : localStorage.getItem("user_id"),
         amount,
         appointmentId
       });

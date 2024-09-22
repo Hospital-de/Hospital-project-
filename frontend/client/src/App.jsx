@@ -1,8 +1,3 @@
-
-
-
-
-
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -49,8 +44,9 @@ function App() {
     <Router>
       <div className="App">
       <PayPalScriptProvider options={{ "client-id": "AZZnJo9B4ulFid8Kdc6--QozivoXGg7263KyHe5KFomW-t-qQQ4cWR7l2lFScv10s0N_iq-DQpewLwDJ" }}>
-      <PayPalPayment amount="10.00" userId="123" appointmentId="456" />
+
         <Routes>
+        <Route path="/paypal" element={ <PayPalPayment amount="10.00" userId="123" appointmentId="456" />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/appointments" element={<AppointmentsDashboard />} />
           <Route path="/MedicalRecords" element={<PatientMedicalRecords />} />
@@ -67,18 +63,7 @@ function App() {
           <Route path="/doctor/:id" element={<CombinedDentalAppointment />} />
           <Route path="/ourdoctors" element={<DoctorsList />} />
           <Route path="/" element={ <Home /> } />
-          <Route
-            path="/DoctorDashboardMain"
-            element={
-              <PrivateRoute allowedRoles={["Doctor"]}>
-
-                <DoctorDashboardMain />
-
-              </PrivateRoute>
-            }
-          />
-
-
+          <Route path="/DoctorDashboardMain" element={ <DoctorDashboardMain /> } />
 <Route path="/Appointmentforusertestfile" element={<Appointmentforusertestfile/>} />
 
         </Routes>
@@ -90,3 +75,6 @@ function App() {
 }
 
 export default App;
+
+
+

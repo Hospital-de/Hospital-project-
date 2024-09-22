@@ -33,9 +33,8 @@ import authReducer from "../redux/slices/authslice";
 import allPatientsSlice from "./slices/admainSlice/allPatientsSlice";
 import allDoctorsSlice from "./slices/admainSlice/allDoctorsSlice";
 import MedicalRecords from "./slices/admainSlice/MedicalRecords";
-import appointmentsReducer from "../redux/slices/appointmentsSlice";
+import appointmentsReducer from "../redux/slices/appointmentsSlice"
 import profileReducer from "./slices/profileSlice";
-
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -47,4 +46,6 @@ export const store = configureStore({
   },
 });
 
+
 export default store;
+

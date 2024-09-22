@@ -47,7 +47,6 @@ const getDoctorAvailability = async (req, res) => {
   }
 };
 
-// Edit doctor availability
 
 // Edit doctor availability
 const editDoctorAvailability = async (req, res) => {
@@ -111,6 +110,8 @@ const getAllDoctorAvailability = async (req, res) => {
       res.status(500).json({ message: 'Server error fetching availability' });
   }
 };
+
+
 
 module.exports = {
   addDoctorAvailability,

@@ -15,9 +15,12 @@ const chatRoutes = require('./routes/chatroutes');
 const setupSocketIO = require('./socketHandler');
 
 const profileRoutes = require("./routes/profileRoutes");
+const userRoutes = require("./routes/userroutes");
 const appointmentRoutes = require("./routes/appointmentRoutes");
 const medicalRecordsRoutes = require("./routes/MedicalRecordsRoutes");
-const doctorRoutes = require("./routes/doctorsroutes");
+
+const doctorRoutes=require('./routes/doctorsroutes');
+
 const doctorAvailabilityRoutes = require('./routes/doctorAvailabilityRoutes')
 const doctorAppointmentRoute = require('./routes/doctorAppointment')
 
@@ -32,7 +35,10 @@ const PORT = process.env.PORT || 4025;
 app.use(cors());
 app.use(express.json());
 app.use('/api/auth', authRoutes);
-app.use('/api/doctors', doctorRoutes);
+app.use('/api/doctors', doctorroutes);
+
+app.use('/api/users', userRoutes);
+
 app.use('/api/chat', chatRoutes);
 app.use("/api/admain", admain);
 app.use("/api/profile", profileRoutes);

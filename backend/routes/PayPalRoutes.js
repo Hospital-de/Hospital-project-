@@ -1,3 +1,6 @@
+
+// C:\Users\Orange\Desktop\Hospital-project-\backend\routes\PayPalRoutes.js
+
 const express = require('express');
 const router = express.Router();
 const PayPalController = require('../controllers/PayPalController');

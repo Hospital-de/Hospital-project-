@@ -55,12 +55,35 @@
 // module.exports = router;
 // routes/userRoutes.js
 
-const express = require("express");
-const router = express.Router();
-const {
+const pool = require("../config/db");
+
+const getMedicalRecordsForUser = async (req, res) => {
+  const userId = req.params.userId;
+  const query = `
+    SELECT pmr.*, u.name AS doctor_name, dd.specialization
+    FROM PatientMedicalRecords pmr
+    INNER JOIN Users u ON pmr.doctor_id = u.id
+    LEFT JOIN DoctorDetails dd ON pmr.doctor_details = dd.id
+    WHERE pmr.patient_id = $1 AND pmr.is_deleted = FALSE
+    ORDER BY pmr.visit_date DESC
+  `;
+
+  try {
+    const result = await pool.query(query, [userId]);
+
+    res.status(200).json({
+      success: true,
+      data: result.rows,
+    });
+  } catch (error) {
+    console.error("Error fetching medical records for user:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
+module.exports = {
   getMedicalRecordsForUser,
-} = require("../controllers/medicalRecordsController");
-
-router.get("/:userId", getMedicalRecordsForUser);
-
-module.exports = router;
+};

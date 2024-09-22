@@ -47,7 +47,6 @@ const AppointmentFormPopup = ({ onClose, selectedDate }) => {
     setError('');
 
     try {
-      const doctorId = 1; 
       const timeSlot = formatTimeSlot();
 
       await axios.post('http://localhost:4025/api/availability', {
