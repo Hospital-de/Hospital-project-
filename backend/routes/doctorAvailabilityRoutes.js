@@ -15,7 +15,6 @@ router.get('/Allavailability', DoctorAvailability.getAllDoctorAvailability);
 
 
 
-
 // GET availability for a specific doctor
 
 module.exports = router;
