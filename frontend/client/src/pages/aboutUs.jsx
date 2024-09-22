@@ -1,11 +1,12 @@
 import React from 'react';
 import { FaHospital, FaUserMd, FaAward, FaHandHoldingMedical } from 'react-icons/fa';
-
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 const AboutUs = () => {
   return (
     <div className="font-sans">
-      
+      <Header/>
       
       {/* Hero Section */}
       <section className="bg-blue-200 text-blue-800 py-20">
@@ -131,7 +132,7 @@ const AboutUs = () => {
         </div>
       </section>
 
-      
+      <Footer/>
     </div>
   );
 };

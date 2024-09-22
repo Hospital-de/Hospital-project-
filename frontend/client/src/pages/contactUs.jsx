@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { User, Mail, Calendar, MessageSquare, CheckCircle, AlertCircle } from 'lucide-react';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 const ContactUs = () => {
   const [formData, setFormData] = useState({
@@ -32,6 +34,9 @@ const ContactUs = () => {
   };
 
   return (
+    <div>
+
+    <Header/>
     <section className="bg-gradient-to-br from-blue-100 to-blue-200 py-16">
       <div className="container mx-auto max-w-7xl px-4">
         <h2 className="text-4xl font-bold text-center mb-10 text-blue-800">Get in Touch</h2>
@@ -145,6 +150,9 @@ const ContactUs = () => {
         </div>
       </div>
     </section>
+    <Footer/>
+    </div>
+
   );
 };
 

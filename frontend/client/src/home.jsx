@@ -54,11 +54,15 @@ const Home = () => {
   };
 
   return (
+    <div>
+
+ <Header />
+   
     <div
       className="font-sans text-sm"
       style={{ fontFamily: "'Poppins', sans-serif" }}
     >
-      <Header />
+     
 
       {/* Hero Section with Video Background */}
       <section className="relative h-screen overflow-hidden">
@@ -421,7 +425,7 @@ const Home = () => {
       </section>
 
       {/* Footer */}
-      <Footer />
+     
 
       {/* Scroll to Top Button */}
       <motion.button
@@ -463,6 +467,8 @@ const Home = () => {
           </motion.button>
         </div>
       </section>
+      <Footer />
+    </div>
     </div>
   );
 };

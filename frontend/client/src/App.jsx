@@ -31,6 +31,7 @@ import ChatWindow from './pages/doctordashboard/ChatWindow';
 import DoctorChat from './pages/doctordashboard/DoctorChat';
 import UserListChat from './pages/doctordashboard/UserListChat';
 import DoctorPostsPage from './pages/DoctorPostsPage';
+import DoctorsPage from './pages/DoctorsPage';
 
 
 
@@ -58,20 +59,17 @@ function App() {
 
         <Routes>
 
-        <Route path="/UserListChat" element={<UserListChat />} />
-        <Route path="/DoctorChat" element={<DoctorChat />} />
-        <Route path="/ChatWindow" element={<ChatWindow />} />
-        <Route path="/DoctorPostsPage" element={<DoctorPostsPage />} />
-   
+          <Route path="/UserListChat" element={<UserListChat />} />
+          <Route path="/DoctorsPage" element={<DoctorsPage />} />
 
-
+          <Route path="/DoctorChat" element={<DoctorChat />} />
+          <Route path="/ChatWindow" element={<ChatWindow />} />
+          <Route path="/DoctorPostsPage" element={<DoctorPostsPage />} />
           <Route path="/AppointmentForDoctor" element={<AppointmentForDoctor />} />
           <Route path="/AppointmentsPage" element={<AppointmentsPage />} />
           <Route path="/MedicalReport" element={<MedicalReport />} />
           <Route path="/PatientRecordsCards" element={<PatientRecordsCards />} />
-
-        <Route path="/paypal" element={ <PayPalPayment amount="10.00" userId="123" appointmentId="456" />} />
-
+          <Route path="/paypal" element={ <PayPalPayment amount="10.00" userId="123" appointmentId="456" />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/appointments" element={<AppointmentsDashboard />} />
           <Route path="/MedicalRecords" element={<PatientMedicalRecords />} />
@@ -89,24 +87,7 @@ function App() {
           <Route path="/ourdoctors" element={<DoctorsList />} />
           <Route path="/" element={ <Home /> } />
           <Route path="/DoctorDashboardMain" element={ <DoctorDashboardMain /> } />
-
-
-          {/* <Route
-            path="/DoctorDashboardMain"
-            element={
-              <PrivateRoute allowedRoles={["Doctor"]}>
-
-                <DoctorDashboardMain />
-
-              </PrivateRoute>
-            }
-          /> */}
-
-
-          
-
-
-<Route path="/Appointmentforusertestfile" element={<Appointmentforusertestfile/>} />
+          <Route path="/Appointmentforusertestfile" element={<Appointmentforusertestfile/>} />
 
         </Routes>
         </PayPalScriptProvider>
