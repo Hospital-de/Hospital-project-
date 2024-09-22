@@ -15,6 +15,7 @@ const chatRoutes = require('./routes/chatroutes');
 const setupSocketIO = require('./socketHandler');
 
 const profileRoutes = require("./routes/profileRoutes");
+const userRoutes = require("./routes/userroutes");
 const appointmentRoutes = require("./routes/appointmentRoutes");
 const medicalRecordsRoutes = require("./routes/MedicalRecordsRoutes");
 const doctorroutes=require('./routes/doctorsroutes');
@@ -33,7 +34,8 @@ app.use(express.json());
 
 
 app.use('/api/auth', authRoutes);
-app.use('/api/doctors', doctorRoutes);
+app.use('/api/doctors', doctorroutes);
+app.use('/api/users', userRoutes);
 
 app.use('/api/chat', chatRoutes);
 
