@@ -5,7 +5,7 @@ import axios from 'axios';
 import io from 'socket.io-client';
 import Footer from "./components/Footer";
 import Header from "./components/Header";
-import Appointmentforusertestfile from '../src/Appointmentforusertestfile'
+import Appointmentforusertestfile from '../src/pages/Appointmentforusertestfile'
 
 const CombinedDentalAppointment = () => {
   const { id } = useParams();
