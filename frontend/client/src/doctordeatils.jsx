@@ -41,7 +41,9 @@ const CombinedDentalAppointment = () => {
     fetchDoctorDetails();
 
     // Initialize Socket.IO connection
+
     socketRef.current = io('http://localhost:4025');
+
 
     // Clean up on component unmount
     return () => {

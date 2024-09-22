@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday } from 'date-fns';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, Clock } from 'lucide-react';
 import axios from 'axios';
@@ -6,6 +6,7 @@ import AppointmentFormPopup from './AppointmentFormPopup';
 import 'react-calendar/dist/Calendar.css';
 import WelcomingAppointment from './WelcomingAppointment';
 import AppointmentActions from './AppointmentActions';
+
 
 const AppointmentForDoctor = () => {
   const [availability, setAvailability] = useState([]);

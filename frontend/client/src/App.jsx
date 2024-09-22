@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -22,6 +23,16 @@ import Doctors from "./admain/Doctors";
 import AdminDashboard from "./admain/AdminDashboard";
 import AppointmentsDashboard from "./admain/Appointments";
 import PatientMedicalRecords from "./admain/MedicalRecords";
+import AppointmentsPage from './pages/doctordashboard/AppointmentsPage';
+import MedicalReport from './pages/doctordashboard/MedicalReport';
+import PatientRecordsCards from './pages/doctordashboard/PatientRecordsCards';
+import AppointmentForDoctor from './pages/doctordashboard/AppointmentForrDoctor';
+import ChatWindow from './pages/doctordashboard/ChatWindow';
+import DoctorChat from './pages/doctordashboard/DoctorChat';
+import UserListChat from './pages/doctordashboard/UserListChat';
+import DoctorPostsPage from './pages/DoctorPostsPage';
+
+
 
 
 const PrivateRoute = ({ children, allowedRoles }) => {
@@ -46,7 +57,21 @@ function App() {
       <PayPalScriptProvider options={{ "client-id": "AZZnJo9B4ulFid8Kdc6--QozivoXGg7263KyHe5KFomW-t-qQQ4cWR7l2lFScv10s0N_iq-DQpewLwDJ" }}>
 
         <Routes>
+
+        <Route path="/UserListChat" element={<UserListChat />} />
+        <Route path="/DoctorChat" element={<DoctorChat />} />
+        <Route path="/ChatWindow" element={<ChatWindow />} />
+        <Route path="/DoctorPostsPage" element={<DoctorPostsPage />} />
+   
+
+
+          <Route path="/AppointmentForDoctor" element={<AppointmentForDoctor />} />
+          <Route path="/AppointmentsPage" element={<AppointmentsPage />} />
+          <Route path="/MedicalReport" element={<MedicalReport />} />
+          <Route path="/PatientRecordsCards" element={<PatientRecordsCards />} />
+
         <Route path="/paypal" element={ <PayPalPayment amount="10.00" userId="123" appointmentId="456" />} />
+
           <Route path="/signup" element={<Signup />} />
           <Route path="/appointments" element={<AppointmentsDashboard />} />
           <Route path="/MedicalRecords" element={<PatientMedicalRecords />} />
@@ -64,6 +89,23 @@ function App() {
           <Route path="/ourdoctors" element={<DoctorsList />} />
           <Route path="/" element={ <Home /> } />
           <Route path="/DoctorDashboardMain" element={ <DoctorDashboardMain /> } />
+
+
+          {/* <Route
+            path="/DoctorDashboardMain"
+            element={
+              <PrivateRoute allowedRoles={["Doctor"]}>
+
+                <DoctorDashboardMain />
+
+              </PrivateRoute>
+            }
+          /> */}
+
+
+          
+
+
 <Route path="/Appointmentforusertestfile" element={<Appointmentforusertestfile/>} />
 
         </Routes>
