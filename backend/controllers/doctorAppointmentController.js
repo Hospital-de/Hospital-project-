@@ -73,62 +73,101 @@ exports.getDoctorAppointments = async (req, res) => {
 
 // Function to book an appointment
 
+const axios = require('axios');
+
+// PayPal API configuration
+const PAYPAL_API_BASE = 'https://api-m.sandbox.paypal.com'; 
+const PAYPAL_CLIENT_ID = 'AX5VEDtd9xOVzxNpnMEIhTPLPpld_TQIT9mDq1kTfsfRtVGDvf5uUX27mLtwqZctVoDSnGRTfMsdozAB';
+const PAYPAL_CLIENT_SECRET ='EI-EThy7Jf_GOodSUWf3CI0QBXwTC9foDJBrkAhadla3-VxSEu7vydYlsbfIL2sQhIleGmNT5mi1Bwq7';
+
+// Function to get PayPal access token
+async function getPayPalAccessToken() {
+  const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`).toString('base64');
+  const response = await axios.post(`${PAYPAL_API_BASE}/v1/oauth2/token`, 'grant_type=client_credentials', {
+    headers: {
+      'Authorization': `Basic ${auth}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+  });
+  return response.data.access_token;
+}
+
+// Function to verify PayPal payment
+async function verifyPayPalPayment(orderId) {
+  const accessToken = await getPayPalAccessToken();
+  const response = await axios.get(`${PAYPAL_API_BASE}/v2/checkout/orders/${orderId}`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  });
+  return response.data;
+}
+
 exports.bookAppointment = async (req, res) => {
-    const { patient_id, doctor_id, availability_id, notes } = req.body;
-  
+    const { patient_id, doctor_id, availability_id, notes, orderId } = req.body;
+
     try {
-      // Start a transaction
-      await pool.query('BEGIN');
-  
-      // 1. Update DoctorAvailability table to mark the appointment as booked
-      const updateQuery = `
-        UPDATE DoctorAvailability 
-        SET is_booked = true 
-        WHERE id = $1 AND doctor_id = $2 AND is_available = true AND is_booked = false 
-        RETURNING *;
-      `;
-      const updateResult = await pool.query(updateQuery, [availability_id, doctor_id]);
-  
-      // Check if the slot was successfully booked
-      if (updateResult.rows.length === 0) {
-        await pool.query('ROLLBACK');
-        return res.status(400).json({ message: 'Appointment slot already booked or not available.' });
-      }
-  
-      // 2. Insert into Appointments table
-      const insertQuery = `
-        INSERT INTO Appointments (patient_id, doctor_id, availability_id, notes)
-        VALUES ($1, $2, $3, $4)
-        RETURNING *;
-      `;
-      const appointmentResult = await pool.query(insertQuery, [patient_id, doctor_id, availability_id, notes]);
-  
-      // 3. Fetch doctor's name
-      const doctorQuery = `
-        SELECT name FROM Users WHERE id = $1;
-      `;
-      const doctorResult = await pool.query(doctorQuery, [doctor_id]);
-  
-      // Commit the transaction
-      await pool.query('COMMIT');
-  
-      // Send the response back to the client
-      return res.status(201).json({
-        message: 'Appointment booked successfully.',
-        appointment: {
-          ...appointmentResult.rows[0],
-          doctor_name: doctorResult.rows[0]?.name || 'Unknown',
-          date: updateResult.rows[0].date,
-          time_slot: updateResult.rows[0].time_slot
-        },
-      });
-    } catch (error) {
-      // Rollback the transaction in case of error
-      await pool.query('ROLLBACK');
-      console.error('Error booking appointment:', error);
-      if (error.constraint === 'appointments_patient_id_doctor_id_availability_id_key') {
-        return res.status(400).json({ message: 'You have already booked this appointment.' });
-      }
-      return res.status(500).json({ message: 'Internal server error.' });
-    }
-  };
+        // Verify PayPal payment
+        const paymentDetails = await verifyPayPalPayment(orderId);
+
+        // Check payment status
+        if (paymentDetails.status !== 'COMPLETED') {
+            return res.status(400).json({ message: 'Payment not completed.' });
+        }
+
+        // Start a transaction
+           // Start a transaction
+           await pool.query('BEGIN');
+
+           // 1. Update DoctorAvailability table to mark the appointment as booked
+           const updateQuery = `
+               UPDATE DoctorAvailability 
+               SET is_booked = true
+               WHERE id = $1 AND doctor_id = $2 AND is_available = true AND is_booked = false
+               RETURNING *;
+           `;
+           const updateResult = await pool.query(updateQuery, [availability_id, doctor_id]);
+   
+           // Check if the slot was successfully booked
+           if (updateResult.rows.length === 0) {
+               await pool.query('ROLLBACK');
+               return res.status(400).json({ message: 'Appointment slot already booked or not available.' });
+           }
+   
+           // 2. Insert into Appointments table
+           const insertQuery = `
+               INSERT INTO Appointments (patient_id, doctor_id, availability_id, notes, status)
+               VALUES ($1, $2, $3, $4, $5)
+               RETURNING *;
+           `;
+           const appointmentResult = await pool.query(insertQuery, [patient_id, doctor_id, availability_id, notes, true]);
+   
+           // 3. Fetch doctor's name
+           const doctorQuery = `
+               SELECT name FROM Users WHERE id = $1;
+           `;
+           const doctorResult = await pool.query(doctorQuery, [doctor_id]);
+   
+           // Commit the transaction
+           await pool.query('COMMIT');
+   
+           // Send the response back to the client
+           return res.status(201).json({
+               message: 'Appointment booked and paid successfully.',
+               appointment: {
+                   ...appointmentResult.rows[0],
+                   doctor_name: doctorResult.rows[0]?.name || 'Unknown',
+                   date: updateResult.rows[0].date,
+                   time_slot: updateResult.rows[0].time_slot
+               },
+           });
+       } catch (error) {
+           // Rollback the transaction in case of error
+           await pool.query('ROLLBACK');
+           console.error('Error booking appointment:', error);
+           if (error.constraint === 'appointments_patient_id_doctor_id_availability_id_key') {
+               return res.status(400).json({ message: 'You have already booked this appointment.' });
+           }
+           return res.status(500).json({ message: 'Internal server error.' });
+       }
+   };

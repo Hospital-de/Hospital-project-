@@ -31,7 +31,7 @@ import ChatWindow from './pages/doctordashboard/ChatWindow';
 import DoctorChat from './pages/doctordashboard/DoctorChat';
 import UserListChat from './pages/doctordashboard/UserListChat';
 import DoctorPostsPage from './pages/DoctorPostsPage';
-import DoctorsPage from './pages/DoctorsPage';
+
 
 
 
@@ -60,8 +60,6 @@ function App() {
         <Routes>
 
           <Route path="/UserListChat" element={<UserListChat />} />
-          <Route path="/DoctorsPage" element={<DoctorsPage />} />
-
           <Route path="/DoctorChat" element={<DoctorChat />} />
           <Route path="/ChatWindow" element={<ChatWindow />} />
           <Route path="/DoctorPostsPage" element={<DoctorPostsPage />} />

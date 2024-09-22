@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday, parseISO } from 'date-fns';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import axios from 'axios';
@@ -8,6 +8,8 @@ const Appointmentforusertestfile = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentDate, setCurrentDate] = useState(new Date());
   const [doctorId, setDoctorId] = useState(1); // Replace with actual doctor ID
+  const [selectedAvailability, setSelectedAvailability] = useState(null);
+  const paypalRef = useRef();
 
   // Fetch availabilities for the entire month
   const fetchMonthAvailabilities = useCallback(async (date) => {
@@ -32,6 +34,30 @@ const Appointmentforusertestfile = () => {
   useEffect(() => {
     fetchMonthAvailabilities(currentDate);
   }, [fetchMonthAvailabilities, currentDate]);
+
+  useEffect(() => {
+    if (window.paypal && selectedAvailability) {
+      window.paypal.Buttons({
+        createOrder: (data, actions) => {
+          return actions.order.create({
+            purchase_units: [{
+              amount: {
+                value: '10.00' // Replace with actual appointment cost
+              }
+            }]
+          });
+        },
+        onApprove: async (data, actions) => {
+          const order = await actions.order.capture();
+          await bookAppointment(selectedAvailability, order.id);
+        },
+        onError: (err) => {
+          console.error('PayPal Error:', err);
+          alert('An error occurred with the payment. Please try again.');
+        }
+      }).render(paypalRef.current);
+    }
+  }, [selectedAvailability]);
 
   // Handle date change from the calendar
   const handleDateChange = (date) => {
@@ -79,21 +105,23 @@ const Appointmentforusertestfile = () => {
   }, [availabilities, currentDate, selectedDate]);
 
   // Book an appointment
-  const bookAppointment = async (availability) => {
+  const bookAppointment = async (availability, orderId) => {
     try {
+      const patient_id = localStorage.getItem("user_id");
       const response = await axios.post('http://localhost:4025/api/appointments/book', {
-        patient_id: 11,
+        patient_id: patient_id,
         doctor_id: doctorId,
         availability_id: availability.id,
-        notes: "Booked via web interface"
+        notes: "Booked via web interface",
+        orderId: orderId
       });
       if (response.status === 201) {
-        // Update the local state to reflect the booking
         const updatedAvailabilities = availabilities.map(avail =>
           avail.id === availability.id ? { ...avail, is_booked: true } : avail
         );
         setAvailabilities(updatedAvailabilities);
-        alert('Appointment booked successfully!');
+        setSelectedAvailability(null);
+        alert('Appointment booked and paid successfully!');
       }
     } catch (error) {
       console.error('Error booking appointment:', error);
@@ -167,10 +195,10 @@ const Appointmentforusertestfile = () => {
                         <p className="text-sm text-gray-600">Doctor ID: {doctorId}</p>
                         {!availability.is_booked && (
                           <button 
-                            onClick={() => bookAppointment(availability)}
+                            onClick={() => setSelectedAvailability(availability)}
                             className="mt-2 bg-teal-900 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300"
                           >
-                            Book Appointment
+                            Select Appointment
                           </button>
                         )}
                         {availability.is_booked && (
@@ -185,6 +213,15 @@ const Appointmentforusertestfile = () => {
               </ul>
             </div>
           </div>
+
+          {selectedAvailability && (
+            <div className="mt-8 bg-white rounded-xl shadow-sm p-6">
+              <h3 className="text-xl font-semibold mb-4 text-gray-700">Confirm and Pay</h3>
+              <p className="mb-2">Appointment: {format(parseISO(selectedAvailability.date), 'MMMM d, yyyy')} at {selectedAvailability.time_slot}</p>
+              <p className="mb-4">Cost: $10.00</p>
+              <div ref={paypalRef}></div>
+            </div>
+          )}
         </div>
       </div>
     </div>
