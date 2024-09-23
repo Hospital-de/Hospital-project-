@@ -18,14 +18,14 @@ Appointments
 Patient details
 Technologies Used
 # Frontend:
-React.js: For building the user interface
-JavaScript: To manage client-side logic
-Tailwind CSS: For styling and responsive design
+### React.js: For building the user interface
+### JavaScript: To manage client-side logic
+### Tailwind CSS: For styling and responsive design
 # Backend:
-Node.js: For the server-side environment
-Express.js: For building RESTful APIs and handling backend logic
+### Node.js: For the server-side environment
+### Express.js: For building RESTful APIs and handling backend logic
 # Database:
-PostgreSQL: For storing and managing patient, doctor, and appointment data
+### PostgreSQL: For storing and managing patient, doctor, and appointment data
 Design and Task Management
 # Figma:
 ## Figma Design: View the design prototype for the user interface.
