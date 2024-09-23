@@ -22,7 +22,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-gradient-to-b from-blue-900 to-blue-800 text-white py-12">
+    <footer className="bg-gradient-to-b from-[rgba(52,165,177,0.7)] to-[rgba(52,165,177,0.7)] text-white py-12">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
@@ -94,7 +94,7 @@ const Footer = () => {
           </div>
         </div>
         
-        <div className="border-t border-blue-700 mt-8 pt-8 text-center">
+        <div className="border-t border-[#34a5b1] mt-8 pt-8 text-center">
           <p>&copy; {currentYear} DentalCare Pro. All rights reserved.</p>
         </div>
       </div>

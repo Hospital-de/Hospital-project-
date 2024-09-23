@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { updateProfile } from "../redux/slices/profileSlice";
+import { fetchUserById } from "../redux/slices/authslice";
 import axios from "axios";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -18,15 +19,28 @@ import {
 
 const MedicalRecords = () => {
   const [medicalRecords, setMedicalRecords] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const user = useSelector((state) => state.auth.user);
-  
+  const [localLoading, setLocalLoading] = useState(false); // Component-specific loading state
+  const [localError, setLocalError] = useState(null); // Component-specific error state
+
+  const dispatch = useDispatch();
+
+  // Access user data and loading/error states from Redux
+  const { user, loading: userLoading, error: userError } = useSelector((state) => state.auth);
+  const userId = localStorage.getItem("user_id");
+
+  // Fetch user data and medical records when component mounts
+  useEffect(() => {
+    if (userId) {
+      dispatch(fetchUserById(userId)); // Fetch user data if userId is available
+    }
+  }, [dispatch, userId]);
+
+  // Fetch medical records only after user data has been successfully fetched and token is available
   useEffect(() => {
     const fetchMedicalRecords = async () => {
       try {
-        setLoading(true);
-        setError(null);
+        setLocalLoading(true);
+        setLocalError(null); // Clear previous errors
 
         if (!user || !user.token) {
           throw new Error("User token not available");
@@ -36,29 +50,28 @@ const MedicalRecords = () => {
           `http://localhost:4025/api/medical-records`,
           {
             headers: {
-              Authorization: `Bearer ${user.token}`,
+              Authorization: `Bearer ${user.token}`, // Send user token in headers
               "Content-Type": "application/json",
             },
           }
         );
 
-        setMedicalRecords(response.data);
+        setMedicalRecords(response.data); // Store fetched medical records
       } catch (err) {
         console.error("Error fetching medical records:", err);
-        setError(
-          err.response?.data?.error || "Failed to fetch medical records"
-        );
+        setLocalError(err.response?.data?.error || "Failed to fetch medical records");
       } finally {
-        setLoading(false);
+        setLocalLoading(false);
       }
     };
 
     if (user && user.token) {
-      fetchMedicalRecords();
+      fetchMedicalRecords(); // Trigger fetching medical records only when user token is ready
     }
   }, [user]);
 
-  if (loading) {
+  // Show global loading from Redux (when fetching user)
+  if (userLoading) {
     return (
       <div className="flex justify-center items-center h-64">
         <FaSpinner className="animate-spin text-blue-500 text-4xl" />
@@ -66,12 +79,24 @@ const MedicalRecords = () => {
     );
   }
 
-  if (error) {
+  // Show global error if user fetching failed
+  if (userError) {
+    return <div className="text-red-600 p-4 bg-red-100 rounded-lg">{userError}</div>;
+  }
+
+  // Show local loading state for medical records
+  if (localLoading) {
     return (
-      <div className="text-red-600 p-4 bg-red-100 rounded-lg">{error}</div>
+      <div className="flex justify-center items-center h-64">
+        <FaSpinner className="animate-spin text-blue-500 text-4xl" />
+      </div>
     );
   }
 
+  // Show local error state for medical records
+  if (localError) {
+    return <div className="text-red-600 p-4 bg-red-100 rounded-lg">{localError}</div>;
+  }
   return (
     <div className="space-y-4">
       <h3 className="text-xl font-semibold mb-4">Medical Records</h3>

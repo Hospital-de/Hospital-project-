@@ -1,5 +1,6 @@
 import React from 'react';
 import { FaHospital, FaUserMd, FaAward, FaHandHoldingMedical } from 'react-icons/fa';
+import img2 from "../assets/ms.jpg";
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
@@ -7,11 +8,10 @@ const AboutUs = () => {
   return (
     <div className="font-sans">
       <Header/>
-      
       {/* Hero Section */}
-      <section className="bg-blue-200 text-blue-800 py-20">
-        <div className="container mx-auto text-center">
-          <h1 className="text-4xl font-bold mb-4">About Bright Smile Dental Clinic</h1>
+      <section className="bg-[#34a5b1] bg-opacity-30 text-black py-20">
+      <div className="container mx-auto text-center">
+          <h1 className="text-4xl font-bold mb-4 ">About Bright Smile Dental Clinic</h1>
           <p className="text-xl mb-8">Revolutionizing dental care with advanced technology and compassionate service</p>
         </div>
       </section>
@@ -22,7 +22,7 @@ const AboutUs = () => {
           <h2 className="text-3xl font-bold text-center mb-10">Our Mission</h2>
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="md:w-1/2 mb-8 md:mb-0">
-              <img src="/api/placeholder/600/400" alt="Dental Team" className="rounded-lg shadow-lg" />
+              <img src={img2} alt="Dental Team" className="rounded-lg shadow-lg" />
             </div>
             <div className="md:w-1/2 md:pl-12">
               <p className="text-lg mb-6">
@@ -37,7 +37,7 @@ const AboutUs = () => {
       </section>
 
       {/* Our Values */}
-      <section className="bg-gray-100 py-16">
+      <section className="bg-[#34a5b1] bg-opacity-30 py-16">
         <div className="container mx-auto">
           <h2 className="text-3xl font-bold text-center mb-10">Our Values</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -48,7 +48,7 @@ const AboutUs = () => {
               { icon: FaHandHoldingMedical, title: "Integrity", description: "We uphold the highest ethical standards in all our practices." }
             ].map((value, index) => (
               <div key={index} className="bg-white p-6 rounded-lg shadow-md text-center">
-                <value.icon size={40} className="text-blue-500 mx-auto mb-4" />
+                <value.icon size={40} className="text-[#34a5b1] mx-auto mb-4" />
                 <h3 className="text-xl font-semibold mb-2">{value.title}</h3>
                 <p>{value.description}</p>
               </div>
@@ -74,27 +74,47 @@ const AboutUs = () => {
               </p>
             </div>
             <div className="md:w-1/2">
-              <img src="/api/placeholder/600/400" alt="Clinic History" className="rounded-lg shadow-lg" />
+              <img src="https://images.ctfassets.net/a5lr4xmo2i3k/1q5INLN2oVPQnQxov1uaqh/e3dea72b266643dcbcb98b5aa731b76b/PDC_Listing_banner_June_24_MWeb_Listing_FreedomOfSmile_070823_copy_2.png" alt="Clinic History" className="rounded-lg shadow-lg" />
             </div>
           </div>
         </div>
       </section>
 
       {/* Our Team */}
-      <section className="bg-blue-200 py-16">
+      <section className="bg-[#34a5b1] bg-opacity-50 py-16">
         <div className="container mx-auto">
           <h2 className="text-3xl font-bold text-center mb-10">Our Team</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { name: "Dr. Ahmed Khaled", role: "Founder & Chief Dentist", specialty: "Orthodontics" },
-              { name: "Dr. Sarah Mohammed", role: "Senior Dentist", specialty: "Oral and Maxillofacial Surgery" },
-              { name: "Dr. Mahmoud Ali", role: "Dentist", specialty: "Root Canal Treatment" },
-              { name: "Dr. Fatima Hassan", role: "Pediatric Dentist", specialty: "Pediatric Dentistry" }
+              { 
+                name: "Dr. Ahmed Khaled", 
+                role: "Founder & Chief Dentist", 
+                specialty: "Orthodontics",
+                image: "https://everysmile.co.za/wp-content/uploads/2022/12/Doctor-Zsazsanov-Mabutho-Zungu-1024x629.webp"
+              },
+              { 
+                name: "Dr. Mahmoud Ali", 
+                role: "Senior Dentist", 
+                specialty: "Oral and Maxillofacial Surgery",
+                image: "https://www.advantagedental.com/sites/default/files/2023-03/Dentist-Smiling-At-Work.jpg"
+              },
+              { 
+                name: "Dr. Fatima Hassan", 
+                role: "Dentist", 
+                specialty: "Root Canal Treatment",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrWV0k7oaKA2QesTOs1aJWKqjVT3vXz6D_0w&s"
+              },
+              { 
+                name: "Dr. john Hassan", 
+                role: "Pediatric Dentist", 
+                specialty: "Pediatric Dentistry",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvb9U5pzdG-n-pExrsULb9C-G7LUXOy3FMSg&s"
+              }
             ].map((member, index) => (
               <div key={index} className="bg-white p-6 rounded-lg shadow-md text-center">
-                <img src="/api/placeholder/150/150" alt="member.name" className="rounded-full mx-auto mb-4" />
+                <img src={member.image} alt={member.name} className="w-full h-48 object-cover rounded-lg mb-4" />
                 <h3 className="text-xl font-semibold mb-2">{member.name}</h3>
-                <p className="text-blue-500 mb-2">{member.role}</p>
+                <p className="text-[#34a5b1] mb-2">{member.role}</p>
                 <p className="text-sm text-gray-600">{member.specialty}</p>
               </div>
             ))}
@@ -114,27 +134,15 @@ const AboutUs = () => {
             ].map((testimonial, index) => (
               <div key={index} className="bg-gray-100 p-6 rounded-lg">
                 <p className="mb-4 italic">"{testimonial.text}"</p>
-                <p className="font-semibold text-blue-500">- {testimonial.name}</p>
+                <p className="font-semibold text-">- {testimonial.name}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
-
-      {/* Call to Action */}
-      <section className="bg-blue-500 text-white py-16">
-        <div className="container mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to Experience Our Care?</h2>
-          <p className="text-xl mb-8">Schedule your appointment today and start your journey to a brighter smile!</p>
-          <button className="bg-white text-blue-500 px-8 py-3 rounded-full font-bold hover:bg-blue-100 transition duration-300">
-            Book Your Appointment
-          </button>
-        </div>
-      </section>
-
       <Footer/>
     </div>
   );
 };
 
-export default AboutUs;
+export default AboutUs ;

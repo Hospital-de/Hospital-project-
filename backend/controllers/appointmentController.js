@@ -7,24 +7,23 @@ exports.getUserAppointments = async (req, res) => {
   try {
     const { userId } = req.params;
     const result = await pool.query(
-      `SELECT a.*, 
-        CASE 
-          WHEN a.patient_id = $1 THEN d.name 
-          ELSE p.name 
-        END AS other_party_name,
-        CASE 
-          WHEN a.patient_id = $1 THEN 'Patient' 
-          ELSE 'Doctor' 
-        END AS user_role,
-        da.date AS appointment_date,
-        da.time_slot AS appointment_time,
-        a.doctor_id
-      FROM Appointments a
-      JOIN Users p ON a.patient_id = p.id
-      JOIN Users d ON a.doctor_id = d.id
-      JOIN DoctorAvailability da ON a.availability_id = da.id
-      WHERE (a.patient_id = $1 OR a.doctor_id = $1) AND a.is_deleted = FALSE
-      ORDER BY da.date, da.time_slot`,
+      `SELECT a.id, a.patient_id, a.availability_id, a.status, a.notes, 
+              da.date AS appointment_date, da.time_slot AS appointment_time, 
+              da.doctor_id, 
+              CASE 
+                WHEN a.patient_id = $1 THEN d.name 
+                ELSE p.name 
+              END AS other_party_name,
+              CASE 
+                WHEN a.patient_id = $1 THEN 'Patient' 
+                ELSE 'Doctor' 
+              END AS user_role
+       FROM public.appointments a
+       JOIN public.doctoravailability da ON a.availability_id = da.id
+       JOIN public.users p ON a.patient_id = p.id
+       JOIN public.users d ON da.doctor_id = d.id
+       WHERE (a.patient_id = $1 OR da.doctor_id = $1) AND a.is_deleted = FALSE
+       ORDER BY da.date, da.time_slot`,
       [userId]
     );
 

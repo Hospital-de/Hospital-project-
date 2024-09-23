@@ -119,18 +119,19 @@ const findAppointments = async (req, res) => {
       a.id,
       da.date,
       da.time_slot,
-      CASE WHEN a.status THEN 'confirmed' ELSE 'pending' END AS status,
+      CASE 
+        WHEN a.status = 'confirmed' THEN 'confirmed' 
+        ELSE 'pending' 
+      END AS status,
       a.notes,
       p.name AS patient_name,
-      d.name AS doctor_name
+      da.doctor_id  -- Assuming you have the doctor_id in the DoctorAvailability table
     FROM
-      Appointments a
+      appointments a
     JOIN
-      Users p ON a.patient_id = p.id
+      users p ON a.patient_id = p.id
     JOIN
-      Users d ON a.doctor_id = d.id
-    JOIN
-      DoctorAvailability da ON a.availability_id = da.id
+      doctoravailability da ON a.availability_id = da.id
     WHERE
       a.is_deleted = false
     ORDER BY
@@ -144,6 +145,8 @@ const findAppointments = async (req, res) => {
     res.status(500).json({ error: "Error finding appointments" });
   }
 };
+
+
 
 const findAllMedicalRecords = async (req, res) => {
   const query = `

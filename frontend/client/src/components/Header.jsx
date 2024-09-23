@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X} from 'lucide-react';
+import { FaSignOutAlt } from 'react-icons/fa';
+import { useDispatch,  useSelector } from 'react-redux';
+import { logout } from '../redux/slices/authslice';
+
 
 const ToothIcon = () => (
   <svg
@@ -20,36 +24,72 @@ const ToothIcon = () => (
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const dispatch = useDispatch();
+
+  const handleLogout = () => {
+    dispatch(logout());
+    sessionStorage.removeItem("user");
+    localStorage.removeItem("user_id"); // Optional
+  };
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
+  // Conditional menu items based on authentication status
   const menuItems = [
     { to: '/', label: 'Home' },
-    { to: '/profile', label: 'Profile' },
-    { to: '/DoctorPostsPage', label: 'Doctor Posts' },
+    { to: '/DoctorsPage', label: 'Doctors' },
+    // { to: '/DoctorPostsPage', label: 'Doctor Posts' },
     { to: '/about', label: 'About Us' },
     { to: '/contact', label: 'Contact' },
+    // Only show Profile if the user is authenticated
+    ...(isAuthenticated ? [{ to: '/profile', label: 'Profile' }] : []),
   ];
 
   return (
-    <header className="bg-white text-blue-600 py-4 shadow-md">
+    <header className="bg-white text-[#34a5b1] py-4 shadow-md">
       <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-center items-center">
           <Link to="/" className="flex items-center space-x-2">
             <ToothIcon />
-            <h1 className="text-2xl font-bold text-blue-800">DentalCare Pro</h1>
+            <h1 className="text-2xl font-bold text-[#34a5b1]">DentalCare Pro</h1>
           </Link>
-          <nav className="hidden md:flex space-x-6">
-            {menuItems.map((item) => (
+        </div>
+        <nav className="hidden md:flex justify-center space-x-8 mt-4">
+          {menuItems.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              className="text-lg hover:bg-blue-50 px-4 py-2 rounded-full hover:text-[#34a5b1] transition duration-300 ease-in-out"
+            >
+              {item.label}
+            </Link>
+          ))}
+          {isAuthenticated ? (
+            <button
+              onClick={handleLogout}
+              className="flex items-center hover:bg-blue-50 px-4 py-2 rounded-full hover:text-[#34a5b1] transition duration-300 ease-in-out ml-10"
+            >
+              <FaSignOutAlt className="mr-2" /> Logout
+            </button>
+          ) : (
+            <>
               <Link
-                key={item.to}
-                to={item.to}
-                className="hover:text-blue-800 transition duration-300 ease-in-out"
+                to="/login"
+                className="hover:bg-blue-100 px-4 py-2 rounded-full text-lg hover:text-[#34a5b1] transition duration-300 ease-in-out ml-10 bg-blue-50"
               >
-                {item.label}
+                Login
               </Link>
-            ))}
-          </nav>
+              <Link
+                to="/signup"
+                className="hover:bg-blue-100 px-4 py-2 rounded-full text-lg hover:text-[#34a5b1] transition duration-300 ease-in-out bg-blue-50"
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
+        </nav>
+        <div className="flex justify-center mt-4">
           <button
             className="md:hidden text-blue-600 focus:outline-none"
             onClick={toggleMenu}
@@ -61,17 +101,25 @@ const Header = () => {
       </div>
       {isMenuOpen && (
         <div className="md:hidden mt-4 bg-white border-t border-blue-100">
-          <nav className="flex flex-col space-y-2 p-4">
+          <nav className="flex flex-col items-center space-y-4 p-4">
             {menuItems.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
-                className="hover:bg-blue-50 px-3 py-2 rounded transition duration-300 ease-in-out"
+                className="hover:bg-blue-50 px-4 py-2 rounded-full text-lg hover:text-[#34a5b1] transition duration-300 ease-in-out"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {item.label}
               </Link>
             ))}
+            {isAuthenticated && (
+              <button
+                onClick={handleLogout}
+                className="flex items-center hover:bg-blue-100 px-4 py-2 rounded-full hover:text-[#34a5b1] transition duration-300 ease-in-out bg-blue-50"
+              >
+                <FaSignOutAlt className="mr-2" /> Logout
+              </button>
+            )}
           </nav>
         </div>
       )}
