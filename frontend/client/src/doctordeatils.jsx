@@ -125,7 +125,7 @@ const CombinedDentalAppointment = () => {
     <>
       <Header />
       <div className="max-w-6xl mx-auto shadow-lg overflow-hidden font-sans bg-gray-50">
-        <div className="bg-gradient-to-r from-blue-500 to-blue-700 p-6 text-white">
+        <div className="bg-[#34a5b1] p-6 text-white">
           <Link to="/ourdoctors" className="text-white flex items-center mb-4 hover:text-blue-200 transition-colors">
             <ChevronLeft className="mr-2" />
             Back to Doctors List
@@ -139,7 +139,7 @@ const CombinedDentalAppointment = () => {
             <button
               key={tab.name}
               className={`flex items-center px-4 py-2 rounded-lg transition-colors mr-2 text-lg font-semibold ${
-                activeTab === tab.name ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100 text-gray-600'
+                activeTab === tab.name ? 'bg-blue-50 text-[#34a5b1]' : 'hover:bg-gray-100 text-gray-600'
               }`}
               onClick={() => setActiveTab(tab.name)}
             >
@@ -154,29 +154,29 @@ const CombinedDentalAppointment = () => {
           <div className="flex flex-col md:flex-row justify-between mb-8 bg-white p-6 rounded-lg shadow-md">
             <div className="w-full md:w-2/3 pr-0 md:pr-8 mb-8 md:mb-0">
               <h2 className="text-3xl font-bold text-gray-900 mb-2">{doctor.name}</h2>
-              <p className="text-xl text-blue-600 mb-4">{doctor.hospital_name}</p>
+              <p className="text-xl text-[#34a5b1] mb-4">{doctor.hospital_name}</p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div className="flex items-center">
-                  <Mail className="text-blue-500 mr-3" size={20} />
+                  <Mail className="text-[#34a5b1] mr-3" size={20} />
                   <p className="text-gray-600">{doctor.email}</p>
                 </div>
                 <div className="flex items-center">
-                  <Phone className="text-blue-500 mr-3" size={20} />
+                  <Phone className="text-[#34a5b1] mr-3" size={20} />
                   <p className="text-gray-600">{doctor.phone_number}</p>
                 </div>
                 <div className="flex items-center">
-                  <MapPin className="text-blue-500 mr-3" size={20} />
+                  <MapPin className="text-[#34a5b1] mr-3" size={20} />
                   <p className="text-gray-600">{doctor.address}</p>
                 </div>
                 <div className="flex items-center">
-                  <Clock className="text-blue-500 mr-3" size={20} />
+                  <Clock className="text-[#34a5b1] mr-3" size={20} />
                   <p className="text-gray-600">Mon-Fri, 9AM-5PM</p>
                 </div>
               </div>
               <div className="mt-4">
                 <button
                   onClick={() => setShowChat(!showChat)}
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors flex items-center"
+                  className="bg-[#34a5b1] hover:bg-blue-50 hover:text-[#34a5b1] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors flex items-center"
                 >
                   <MessageCircle className="mr-2" size={20} />
                   {showChat ? 'Hide Chat' : 'Chat with Doctor'}
@@ -190,14 +190,14 @@ const CombinedDentalAppointment = () => {
 
           {showChat && (
             <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-              <h2 className="font-semibold text-2xl flex items-center text-blue-700 mb-4">
-                <MessageCircle className="mr-2 text-blue-500" size={24} />
+              <h2 className="font-semibold text-2xl flex items-center text-[#34a5b1] mb-4">
+                <MessageCircle className="mr-2 text-[#34a5b1]" size={24} />
                 Chat with {doctor.name}
               </h2>
               <div ref={chatBoxRef} className="h-64 overflow-y-auto mb-4 p-4 border rounded">
                 {messages.map((msg, index) => (
                   <div key={index} className={`mb-2 ${msg.sender_id === currentUser.id ? 'text-right' : 'text-left'}`}>
-                    <span className={`inline-block p-2 rounded ${msg.sender_id === currentUser.id ? 'bg-blue-100' : 'bg-gray-100'}`}>
+                    <span className={`inline-block p-2 rounded ${msg.sender_id === currentUser.id ? 'bg-blue-50' : 'bg-gray-100'}`}>
                       {msg.message}
                     </span>
                   </div>
@@ -213,7 +213,7 @@ const CombinedDentalAppointment = () => {
                 />
                 <button
                   type="submit"
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors"
+                  className="bg-[#34a5b1] hover:bg-blue-50 hover:text-[#34a5b1] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors"
                 >
                   Send
                 </button>
@@ -223,8 +223,8 @@ const CombinedDentalAppointment = () => {
 
           {activeTab === 'Book Appointment' && (
             <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-              <h2 className="font-semibold text-2xl flex items-center text-blue-700 mb-4">
-                <Smile className="mr-2 text-blue-500" size={24} />
+              <h2 className="font-semibold text-2xl flex items-center text-[#34a5b1] mb-4">
+                <Smile className="mr-2 text-[#34a5b1]" size={24} />
                 Book an Appointment with {doctor.name}
               </h2>
               <Appointmentforusertestfile doctorId={doctor.id} />
@@ -366,7 +366,7 @@ const ReviewsSection = ({ doctorId, currentUserId }) => {
             <p className="mt-2">{userReview.review}</p>
             <button
               onClick={() => setIsEditing(true)}
-              className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors"
+              className="mt-4 bg-[#34a5b1] hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors"
             >
               Edit Review
             </button>
@@ -395,7 +395,7 @@ const ReviewsSection = ({ doctorId, currentUserId }) => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors ${
+              className={`bg-[#34a5b1] hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors ${
                 isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >

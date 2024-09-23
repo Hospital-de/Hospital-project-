@@ -31,7 +31,7 @@ import ChatWindow from './pages/doctordashboard/ChatWindow';
 import DoctorChat from './pages/doctordashboard/DoctorChat';
 import UserListChat from './pages/doctordashboard/UserListChat';
 import DoctorPostsPage from './pages/DoctorPostsPage';
-
+import DoctorsPage from './pages/DoctorsPage';
 
 
 
@@ -58,7 +58,7 @@ function App() {
       <PayPalScriptProvider options={{ "client-id": "AZZnJo9B4ulFid8Kdc6--QozivoXGg7263KyHe5KFomW-t-qQQ4cWR7l2lFScv10s0N_iq-DQpewLwDJ" }}>
 
         <Routes>
-
+          <Route path="/DoctorsPage" element={<DoctorsPage />} />
           <Route path="/UserListChat" element={<UserListChat />} />
           <Route path="/DoctorChat" element={<DoctorChat />} />
           <Route path="/ChatWindow" element={<ChatWindow />} />

@@ -24,6 +24,17 @@ export const signup = createAsyncThunk(
 );
 
 
+export const fetchUserById = createAsyncThunk(
+  "users/fetchUserById",
+  async (userId, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`http://localhost:4025/api/users/${userId}`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "An error occurred");
+    }
+  }
+);
 
 
 
@@ -86,6 +97,17 @@ const authSlice = createSlice({
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload.error;
+      })
+      .addCase(fetchUserById.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchUserById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;  // Save fetched user data here
+      })
+      .addCase(fetchUserById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });

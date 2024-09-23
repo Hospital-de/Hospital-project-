@@ -12,14 +12,7 @@ const DashboardLayout = ({ children }) => {
           <h2 className="text-lg font-bold">Admin Dashboard</h2>
           <nav className="mt-4">
             <ul>
-              <li>
-                <button
-                  onClick={() => navigate("/AdminDashboard")}
-                  className="block py-2 px-4 hover:bg-blue-700"
-                >
-                  AdminDashboard
-                </button>
-              </li>
+             
               <li>
                 <button
                   onClick={() => navigate("/Allpatients")}

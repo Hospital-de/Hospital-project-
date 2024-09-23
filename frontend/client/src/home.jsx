@@ -4,7 +4,7 @@ import { FaTooth, FaNewspaper, FaArrowRight, FaSmile, FaTeeth, FaCalendarAlt, Fa
 import { motion } from 'framer-motion';
 import Footer from "./components/Footer";
 import Header from "./components/Header";
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 // Assume these imports work for your project structure
 import heroVideo from "./assets/herovid.mp4";
@@ -75,7 +75,8 @@ const Home = () => {
           <source src={heroVideo} type="video/mp4" />
           Your browser does not support the video tag.
         </video>
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/70 to-blue-700/70"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-[rgba(52,165,177,0.7)] to-[rgba(52,165,177,0.7)]"></div>
+
         <div className="absolute inset-0">
           <svg
             className="absolute inset-0 h-full w-full"
@@ -108,21 +109,24 @@ const Home = () => {
             >
               Experience world-class dental care with our expert team
             </motion.p>
-            <motion.button
-              className="bg-white text-blue-700 px-8 py-3 rounded-full font-bold text-sm hover:bg-blue-100 transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Book Your Appointment Now
-            </motion.button>
+            <Link to="/DoctorsPage">
+              <motion.button
+                className="bg-white text-[#34a5b1] px-8 py-3 rounded-full font-bold text-sm hover:bg-blue-100 transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Book Your Appointment Now
+              </motion.button>
+            </Link>
+           
           </div>
         </div>
       </section>
 
       {/* Services Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white my-20">
         <div className="container mx-auto px-4">
-          <h2 className="text-5xl font-bold text-center mb-16 text-gray-800">
+          <h2 className="text-5xl font-bold text-center mb-16 text-[#34a5b1] mt-10">
             Our Services
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -149,12 +153,12 @@ const Home = () => {
                 whileHover={{ y: -5 }}
               >
                 <div className="bg-blue-100 rounded-full p-6 inline-block mb-6">
-                  <service.icon size={48} className="text-blue-600" />
+                  <service.icon size={48} className="text-[#34a5b1]" />
                 </div>
-                <h3 className="text-2xl font-semibold text-gray-800 mb-4">
+                <h3 className="text-2xl font-semibold text-[#34a5b1] mb-4">
                   {service.name}
                 </h3>
-                <p className="text-gray-600 text-center">
+                <p className="text-[#34a5b1]text-center">
                   {service.description}
                 </p>
               </motion.div>
@@ -164,7 +168,7 @@ const Home = () => {
       </section>
 
       {/* Advanced Technology Section */}
-      <section className="py-16 bg-gray-50">
+      {/* <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-4xl font-bold text-center mb-12 text-gray-800">
             Advanced Dental Technology
@@ -195,7 +199,7 @@ const Home = () => {
                 whileHover={{ scale: 1.03 }}
               >
                 <div className="bg-blue-100 rounded-full p-3 inline-block mb-4">
-                  <tech.icon size={24} className="text-blue-600" />
+                  <tech.icon size={24} className="text-[#34a5b1]" />
                 </div>
                 <h3 className="text-lg font-semibold mb-3 text-gray-800">
                   {tech.name}
@@ -205,7 +209,7 @@ const Home = () => {
                   href="https://www.google.com/search?q=advanced+dental+technology"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center text-blue-600 text-sm font-semibold hover:text-blue-800 transition duration-300"
+                  className="inline-flex items-center text-[#34a5b1] text-sm font-semibold hover:text-blue-800 transition duration-300"
                 >
                   Read More <FaArrowRight className="ml-2" size={12} />
                 </a>
@@ -213,10 +217,13 @@ const Home = () => {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
+
+
+        
 
       {/* About Us Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white my-10">
         <div className="container mx-auto px-4 flex items-center">
           <motion.div
             className="w-1/2"
@@ -231,28 +238,31 @@ const Home = () => {
             />
           </motion.div>
           <div className="w-1/2 pl-12">
-            <h2 className="text-4xl font-bold mb-6 text-gray-800">About Us</h2>
+            <h2 className="text-4xl font-bold mb-6 text-[#34a5b1]">About Us</h2>
             <p className="mb-6 text-gray-600 leading-relaxed">
               We are a team of specialized dentists committed to providing the
               highest level of care for our patients' oral health. With years of
               experience and cutting-edge technology, we ensure that every visit
               is comfortable and effective.
             </p>
+
+            <Link to='/about'>
             <motion.button
-              className="bg-blue-600 text-white px-8 py-3 rounded-full font-bold text-sm hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105"
+              className="bg-[#34a5b1] text-white px-8 py-3 rounded-full font-bold text-sm hover:bg-[#34a5b1] transition duration-300 ease-in-out transform hover:scale-105"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
               Learn More
             </motion.button>
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Our Medical Team Section */}
-      <section className="py-16 bg-gray-50">
+    {/* Our Medical Team Section */}
+    <section className="py-20  ">
         <div className="container mx-auto px-4">
-          <h2 className="text-4xl font-bold text-center mb-12 text-gray-800">
+          <h2 className="text-4xl font-bold text-center mb-28 text-[#34a5b1]">
             Our Medical Team
           </h2>
           {loading ? (
@@ -276,20 +286,20 @@ const Home = () => {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <FaUserMd size={48} className="text-blue-600" />
+                      <FaUserMd size={48} className="text-[#34a5b1]" />
                     )}
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                  <h3 className="text-xl font-semibold text-[#34a5b1] mb-2">
                     {doctor.name}
                   </h3>
-                  <p className="text-gray-600 text-sm mb-2">{doctor.email}</p>
-                  <p className="text-gray-600 text-sm mb-2">
+                  <p className="text-[#34a5b1] text-sm mb-2">{doctor.email}</p>
+                  <p className="text-[#34a5b1] text-sm mb-2">
                     {doctor.hospital_name}
                   </p>
-                  <p className="text-gray-600 text-sm mb-2">
+                  <p className="text-[#34a5b1] text-sm mb-2">
                     {doctor.phone_number}
                   </p>
-                  <p className="text-gray-600 text-sm text-center">
+                  <p className="text-[#34a5b1] text-sm text-center">
                     {doctor.address}
                   </p>
                 </motion.div>
@@ -299,24 +309,67 @@ const Home = () => {
         </div>
       </section>
 
+
+
+      <motion.button
+        className="fixed bottom-8 right-8 bg-[#34a5b1] text-white p-3 rounded-full shadow-lg hover:bg-[#34a5b1] transition duration-300 ease-in-out"
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M5 10l7-7m0 0l7 7m-7-7v18"
+          />
+        </svg>
+      </motion.button>
+      <section className="bg-[#34a5b1] py-16 text-white">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-4xl font-bold mb-6">
+            Ready to Schedule Your Visit?
+          </h2>
+          <p className="mb-8 text-lg">
+            Book your appointment today and take the first step towards a
+            healthier smile!
+          </p>
+          <motion.button
+            className="bg-white text-[#34a5b1] px-8 py-3 rounded-full font-bold text-sm hover:bg-blue-100 transition duration-300 ease-in-out transform hover:scale-105"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Book Appointment
+          </motion.button>
+        </div>
+      </section>
+
+
       {/* Testimonials Section */}
-      <section className="bg-blue-50 py-16">
+      <section className=" pb-24 pt-20">
         <div className="container mx-auto px-4">
-          <h2 className="text-4xl font-bold text-center mb-12 text-gray-800">
+          <h2 className="text-4xl font-bold text-center mb-28 text-[#34a5b1]">
             What Our Patients Say
           </h2>
           <div className="grid grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
               <motion.div
                 key={index}
-                className="bg-white p-6 rounded-lg relative shadow-md"
+                className="bg-white p-6 rounded-lg relative shadow-md h-40 pt-10"
                 whileHover={{ scale: 1.03 }}
               >
-                <FaQuoteRight className="text-blue-200 text-3xl absolute top-3 right-3" />
+                <FaQuoteRight className="text-[#34a5b1] text-3xl absolute top-3 right-3" />
                 <p className="mb-4 text-sm leading-relaxed text-gray-600">
                   {testimonial.text}
                 </p>
-                <p className="font-semibold text-sm text-gray-800">
+                <p className="font-semibold text-sm text-[#34a5b1]">
                   - {testimonial.name}
                 </p>
               </motion.div>
@@ -326,9 +379,9 @@ const Home = () => {
       </section>
 
       {/* Latest News Section */}
-      <section className="py-16 bg-white">
+      <section className="pt-16 bg-white pb-24">
         <div className="container mx-auto px-4">
-          <h2 className="text-4xl font-bold text-center mb-12 text-gray-800">
+          <h2 className="text-4xl font-bold text-center mb-12 text-[#34a5b1]">
             Latest News
           </h2>
           <div className="grid grid-cols-3 gap-8">
@@ -339,13 +392,13 @@ const Home = () => {
                 whileHover={{ y: -5 }}
               >
                 <div className="h-40 bg-blue-100 flex items-center justify-center">
-                  <FaNewspaper size={40} className="text-blue-600" />
+                  <FaNewspaper size={40} className="text-[#34a5b1]" />
                 </div>
                 <div className="p-6">
-                  <h3 className="text-lg font-semibold mb-3 text-gray-800">
+                  <h3 className="text-lg font-semibold mb-3 text-gray-500">
                     {item.title}
                   </h3>
-                  <p className="text-blue-600 flex items-center text-sm">
+                  <p className="text-[#34a5b1] flex items-center text-sm">
                     <FaCalendarAlt className="mr-2" size={12} /> {item.date}
                   </p>
                 </div>
@@ -358,7 +411,7 @@ const Home = () => {
       {/* Past Appointments Section */}
 
       {/* Contact Us Section */}
-      <section className="py-16 bg-white">
+      {/* <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-4xl font-bold text-center mb-12 text-gray-800">
             Contact Us
@@ -412,7 +465,7 @@ const Home = () => {
               <div className="mt-6">
                 <motion.button
                   type="submit"
-                  className="w-full bg-blue-600 text-white py-3 rounded-full font-bold text-sm hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105"
+                  className="w-full bg-[#34a5b1] text-white py-3 rounded-full font-bold text-sm hover:bg-[#34a5b1] transition duration-300 ease-in-out transform hover:scale-105"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -422,51 +475,13 @@ const Home = () => {
             </form>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Footer */}
      
 
       {/* Scroll to Top Button */}
-      <motion.button
-        className="fixed bottom-8 right-8 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition duration-300 ease-in-out"
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M5 10l7-7m0 0l7 7m-7-7v18"
-          />
-        </svg>
-      </motion.button>
-      <section className="bg-blue-600 py-16 text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold mb-6">
-            Ready to Schedule Your Visit?
-          </h2>
-          <p className="mb-8 text-lg">
-            Book your appointment today and take the first step towards a
-            healthier smile!
-          </p>
-          <motion.button
-            className="bg-white text-blue-600 px-8 py-3 rounded-full font-bold text-sm hover:bg-blue-100 transition duration-300 ease-in-out transform hover:scale-105"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            Book Appointment
-          </motion.button>
-        </div>
-      </section>
+   
       <Footer />
     </div>
     </div>
