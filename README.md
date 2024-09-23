@@ -26,7 +26,7 @@ Technologies Used
 ### Express.js: For building RESTful APIs and handling backend logic
 # Database:
 ### PostgreSQL: For storing and managing patient, doctor, and appointment data
-Design and Task Management
+## Design and Task Management
 # Figma:
 ## Figma Design: View the design prototype for the user interface.
 ### https://www.figma.com/design/lfZnZqt9Ft2iZbJb0Se648/HMS-Project?node-id=0-1&node-type=canvas&t=W5y5azGMUss90Vf8-0
